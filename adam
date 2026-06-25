@@ -1,992 +1,1298 @@
-import { useState, useEffect } from "react";
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>the_rebornlife — Programme 2025</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0F14;--surface:#13161E;--card:#181C26;--border:#1F2535;
+  --green:#2ECC71;--gdim:#1A7A4A;--gglow:rgba(46,204,113,0.10);
+  --orange:#F39C12;--odim:rgba(243,156,18,0.13);
+  --blue:#3498DB;--bdim:rgba(52,152,219,0.13);
+  --purple:#9B59B6;--pdim:rgba(155,89,182,0.13);
+  --red:#E74C3C;--rdim:rgba(231,76,60,0.13);
+  --text:#E8EAF0;--muted:#6B7280;--sub:#9CA3AF;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;position:sticky;top:0;z-index:200}
+.hdr-in{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
+.hdr-title{font-size:17px;font-weight:800;color:var(--text);margin-top:1px}
+.hdr-right{text-align:right;font-size:12px;color:var(--muted)}
+.hdr-prog{color:var(--green);font-weight:600;margin-top:1px}
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs-in{max-width:860px;margin:0 auto;display:flex;padding:0 8px}
+.tb{padding:11px 11px;border:none;background:transparent;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:400;font-size:13px;border-bottom:2px solid transparent;transition:all .2s;font-family:inherit}
+.tb.on{color:var(--green);font-weight:700;border-bottom-color:var(--green)}
+.wrap{max-width:860px;margin:0 auto;padding:18px 14px 80px;display:flex;flex-direction:column;gap:16px}
+.pnl{display:none;flex-direction:column;gap:16px}
+.pnl.on{display:flex}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.card-h{background:linear-gradient(135deg,var(--card) 0%,#1A2035 100%)}
+.stitle{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.stitle h2{font-size:17px;font-weight:700;color:var(--text)}
+.stitle p{color:var(--muted);font-size:12px;margin-top:1px}
+.badge{display:inline-block;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:600}
+.pbar{background:var(--border);border-radius:99px;height:6px;margin-top:12px}
+.pfill{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--gdim),var(--green));transition:width .4s}
+.task{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .2s;margin-bottom:6px;text-align:left;width:100%}
+.task.done{background:var(--gglow);border-color:rgba(46,204,113,.3)}
+.chk{width:21px;height:21px;border-radius:5px;border:2px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.task.done .chk{background:var(--green);border-color:var(--green)}
+.chk-i{color:#000;font-size:11px;font-weight:800;display:none}
+.task.done .chk-i{display:block}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mitem{background:var(--surface);border-radius:9px;padding:11px 13px;border:1px solid var(--border)}
+.mlbl{color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.mval{color:var(--text);font-size:13px;line-height:1.4}
+.dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dbtn{padding:7px 2px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .2s}
+.dbtn span{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-top:1px}
+.dbtn.on span{color:var(--green)}
+.exo-tbl{width:100%;border-collapse:collapse}
+.exo-tbl th{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;padding:5px 7px;text-align:left}
+.exo-tbl td{padding:10px 7px;font-size:13px}
+.exo-tbl tr:nth-child(odd) td{background:var(--surface)}
+.exo-btn{background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);text-align:left;width:100%;padding:0;font-family:inherit}
+.exo-btn:hover{color:var(--green)}
+.alt-btn{background:var(--rdim);border:1px solid rgba(231,76,60,.3);color:var(--red);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:6px}
+.alt-btn:hover{background:rgba(231,76,60,.25)}
+/* EXO MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:22px}
+.modal-close{float:right;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:4px 10px;cursor:pointer;font-size:13px;color:var(--muted);font-family:inherit}
+.exo-svg{width:100%;border-radius:10px;background:var(--surface);margin:14px 0}
+/* TRACKER */
+.tinputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:10px}
+.igrp label{display:block;color:var(--muted);font-size:11px;font-weight:600;margin-bottom:3px}
+.igrp input,.igrp textarea,.igrp select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.igrp textarea{resize:none}
+.btn-save{width:100%;background:var(--green);color:#000;font-weight:700;font-size:14px;padding:11px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px 9px;text-align:center}
+.sval{font-size:22px;font-weight:800}
+.slbl{font-size:11px;color:var(--muted);margin-top:3px}
+/* PROG TRACKER */
+.week-selector{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.week-selector::-webkit-scrollbar{display:none}
+.wbtn{flex-shrink:0;padding:7px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all .2s;font-family:inherit}
+.wbtn.on{border-color:var(--green);background:var(--gglow);color:var(--green)}
+.muscu-log{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:7px}
+.muscu-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.sets-row{display:flex;gap:6px;flex-wrap:wrap}
+.set-input{width:80px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;outline:none;font-family:inherit}
+/* COURSES */
+.sec-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:14px}
+.sectb{padding:7px 3px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;font-family:inherit;transition:all .2s}
+.sectb span{display:block;font-size:9px;font-weight:600;color:var(--muted);margin-top:1px}
+.sectb.on{border-color:var(--green);background:var(--gglow)}
+.sectb.on span{color:var(--green)}
+.week-filter{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.week-filter::-webkit-scrollbar{display:none}
+.wfbtn{flex-shrink:0;padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--muted);font-family:inherit;transition:all .2s}
+.wfbtn.on{border-color:var(--orange);background:var(--odim);color:var(--orange)}
+.citm{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .2s;margin-bottom:5px;width:100%;text-align:left}
+.citm.done{background:var(--gglow);border-color:rgba(46,204,113,.3)}
+.citm.done .cname{text-decoration:line-through;opacity:.55;color:var(--muted)}
+.cname{flex:1;font-size:14px;color:var(--text)}
+.cqty{font-size:12px;color:var(--muted);flex-shrink:0}
+/* PROGRESS LONG TERM */
+.prog-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px;border-top-width:2px}
+.pc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:7px}
+.pc-val{font-size:14px;color:var(--text);margin-bottom:3px}
+.run-itm{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;border:1px solid var(--border);margin-bottom:5px}
+/* ALERT */
+.alert-o{background:var(--odim);border:1px solid rgba(243,156,18,.3);border-radius:10px;padding:13px 15px;margin-bottom:12px}
+.alert-b{background:var(--bdim);border:1px solid rgba(52,152,219,.3);border-radius:10px;padding:13px 15px;margin-bottom:12px}
+.sched-row{display:flex;gap:11px;padding:9px 11px;border-radius:7px;background:var(--surface);border:1px solid var(--border);margin-bottom:5px}
+.sched-t{min-width:72px;font-size:11px;font-weight:700;flex-shrink:0;padding-top:2px}
+.sched-n{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
+.sched-d{font-size:11px;color:var(--muted)}
+.shot-card{border-radius:11px;padding:14px;border:1px solid var(--border);margin-bottom:10px;border-left-width:3px}
+.inf-hl{background:var(--gglow);border-radius:9px;padding:9px 13px;border:1px solid rgba(46,204,113,.2);margin-top:10px}
+.log-itm{background:var(--surface);border-radius:9px;padding:9px 13px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+@media(max-width:500px){
+  .mgrid{grid-template-columns:1fr}
+  .tinputs{grid-template-columns:1fr 1fr}
+  .prog-grid{grid-template-columns:1fr 1fr}
+  .sgrid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
 
-// ─── DESIGN TOKENS ───
-const C = {
-  bg: "#0D0F14",
-  surface: "#13161E",
-  card: "#181C26",
-  border: "#1F2535",
-  green: "#2ECC71",
-  greenDim: "#1A7A4A",
-  greenGlow: "rgba(46,204,113,0.12)",
-  orange: "#F39C12",
-  orangeDim: "rgba(243,156,18,0.15)",
-  blue: "#3498DB",
-  blueDim: "rgba(52,152,219,0.15)",
-  purple: "#9B59B6",
-  purpleDim: "rgba(155,89,182,0.15)",
-  text: "#E8EAF0",
-  textMuted: "#6B7280",
-  textSub: "#9CA3AF",
-};
-
-// ─── DATA ───
-const DAYS = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
-const TODAY_IDX = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-
-const PROGRAM = {
-  0: { type: "salle", label: "Pecs · Épaules · Triceps", color: C.green, icon: "🏋️" },
-  1: { type: "running", label: "Running autour du siège", color: C.orange, icon: "🏃" },
-  2: { type: "salle", label: "Dos · Biceps", color: C.blue, icon: "🏋️" },
-  3: { type: "repos", label: "Repos actif · Marche 30 min", color: C.purple, icon: "🚶" },
-  4: { type: "salle", label: "Jambes · Fessiers", color: C.green, icon: "🏋️" },
-  5: { type: "running", label: "Running matinal avant 10h", color: C.orange, icon: "🏃" },
-  6: { type: "salle", label: "Full body léger + Batch cooking", color: C.greenDim, icon: "🏋️" },
-};
-
-const INFUSIONS = {
-  0: { nom: "Anis étoilé", moment: "20h15 après dîner", fixed: true },
-  1: { nom: "Fenouil (optionnel)", moment: "Après dîner si ballonnements", fixed: false },
-  2: { nom: "Anis étoilé", moment: "20h15 après dîner", fixed: true },
-  3: { nom: "Menthe (midi)", moment: "Après déjeuner au boulot", fixed: false },
-  4: { nom: "Anis étoilé", moment: "20h45 après dîner", fixed: true },
-  5: { nom: "Anis / Fenouil", moment: "Après dîner", fixed: true },
-  6: { nom: "Anis étoilé", moment: "20h15 après dîner", fixed: true },
-};
-
-const ROUTINE_TASKS = [
-  { id: "eau", label: "Eau + citron au réveil", icon: "💧" },
-  { id: "mobilite", label: "Mobilité trevorsinstinct x2 (8 min)", icon: "🌀" },
-  { id: "vacuum", label: "Vacuum 5 respirations", icon: "🫁" },
-  { id: "pdej", label: "Petit-déjeuner + Oméga 3 + Magnésium", icon: "🍳" },
-  { id: "sport", label: "Séance sport", icon: "⚡" },
-  { id: "creatine", label: "Créatine 3g (avec le dîner)", icon: "💊" },
-  { id: "infusion", label: "Infusion du soir", icon: "🫖" },
-  { id: "journal", label: "Journaling 10 min", icon: "📓" },
-  { id: "lit", label: "Au lit avant 23h · téléphone hors chambre", icon: "😴" },
-];
-
-const RUNNING_WEEKS = [
-  { sem: "S1 (1-7 jul)", dist: "3 → 3,5 km", cap: "Retrouver le rythme" },
-  { sem: "S2 (8-14 jul)", dist: "3,5 → 4 km", cap: "Régularité" },
-  { sem: "S3 (15-21 jul)", dist: "4 → 4,5 km", cap: "Collectif boost" },
-  { sem: "S4 (22-31 jul)", dist: "4,5 → 5 km", cap: "✅ Objectif juillet" },
-  { sem: "S5-S6 (août)", dist: "5 → 6,5 km", cap: "Foulée installée" },
-  { sem: "S7-S8 (août)", dist: "6,5 → 7 km", cap: "✅ Objectif août" },
-  { sem: "S9-S10 (sept)", dist: "7 → 10 km", cap: "Semi-marathon en vue" },
-];
-
-const SALLE_PROGRAM = {
-  0: [
-    { ex: "Développé couché barre", series: "4", reps: "8-10", repos: "90s" },
-    { ex: "Développé incliné haltères", series: "3", reps: "10-12", repos: "75s" },
-    { ex: "Écartés poulies", series: "3", reps: "12-15", repos: "60s" },
-    { ex: "Développé militaire haltères", series: "4", reps: "8-10", repos: "90s" },
-    { ex: "Élévations latérales", series: "3", reps: "12-15", repos: "60s" },
-    { ex: "Dips / Extension triceps", series: "3", reps: "10-12", repos: "75s" },
-  ],
-  2: [
-    { ex: "Tractions / Tirage vertical", series: "4", reps: "8-10", repos: "90s" },
-    { ex: "Rowing barre (Yates)", series: "4", reps: "8-10", repos: "90s" },
-    { ex: "Tirage horizontal câble", series: "3", reps: "10-12", repos: "75s" },
-    { ex: "Pull-over haltère", series: "3", reps: "12-15", repos: "60s" },
-    { ex: "Curl barre droite", series: "4", reps: "8-10", repos: "75s" },
-    { ex: "Curl haltères + marteau", series: "3", reps: "10-12", repos: "60s" },
-  ],
-  4: [
-    { ex: "Squat barre / Goblet", series: "4", reps: "8-10", repos: "120s" },
-    { ex: "Presse à cuisses", series: "4", reps: "10-12", repos: "90s" },
-    { ex: "Fentes marchées haltères", series: "3", reps: "12/jambe", repos: "75s" },
-    { ex: "Leg curl couché", series: "3", reps: "12-15", repos: "60s" },
-    { ex: "Hip thrust barre", series: "4", reps: "10-12", repos: "75s" },
-    { ex: "Mollets debout machine", series: "4", reps: "15-20", repos: "45s" },
-  ],
-  6: [
-    { ex: "Gainage planche", series: "3", reps: "45s", repos: "45s" },
-    { ex: "Pompes prise large", series: "3", reps: "15-20", repos: "60s" },
-    { ex: "Tirage câble léger", series: "3", reps: "15-20", repos: "60s" },
-    { ex: "Squat poids de corps", series: "3", reps: "20", repos: "45s" },
-    { ex: "Hip thrust poids de corps", series: "3", reps: "20", repos: "45s" },
-    { ex: "Étirements globaux", series: "1", reps: "15 min", repos: "—" },
-  ],
-};
-
-const SHOTS = [
-  { nom: "Golden Shot", moment: "Pré-salle (30 min avant)", ingredients: "Gingembre 3cm + curcuma 1/2 c.c. + jus citron + 5cl eau tiède", effet: "Anti-inflammatoire · boost circulation · focus", color: C.orange },
-  { nom: "Shot Running", moment: "Pré-course (30 min avant)", ingredients: "Gingembre 2cm + jus citron + 5cl eau froide", effet: "Tonique · énergie naturelle · cardio", color: C.green },
-  { nom: "Shot Récup", moment: "Post-séance (30 min après)", ingredients: "Gingembre 2cm + curcuma + citron + 5cl eau tiède", effet: "Récupération musculaire · anti-inflammation", color: C.blue },
-  { nom: "Shot Anti-KO", moment: "Midi après déjeuner", ingredients: "Gingembre 2cm + jus citron + 5cl eau froide", effet: "Relance digestive · coupe somnolence", color: C.purple },
-];
-
-const SHOPPING_LIST = {
-  proteines: [
-    { item: "Blancs de poulet halal (1kg)", qty: "2 packs", cat: "🥩" },
-    { item: "Bœuf haché halal (500g)", qty: "1 pack", cat: "🥩" },
-    { item: "Thon en boîte au naturel", qty: "4 boîtes", cat: "🥫" },
-    { item: "Œufs (calibre M)", qty: "1 boîte 12", cat: "🥚" },
-    { item: "Fromage blanc 0%", qty: "2 pots", cat: "🥛" },
-    { item: "Cabillaud / poisson blanc", qty: "2 filets", cat: "🐟" },
-    { item: "Dinde émincée (300g)", qty: "1 pack", cat: "🥩" },
-  ],
-  feculents: [
-    { item: "Riz basmati", qty: "1 kg", cat: "🌾" },
-    { item: "Quinoa", qty: "500g", cat: "🌾" },
-    { item: "Flocons d'avoine", qty: "1 kg", cat: "🌾" },
-    { item: "Pain complet", qty: "1 miche", cat: "🍞" },
-    { item: "Patates douces", qty: "4-5 pièces", cat: "🍠" },
-    { item: "Pâtes complètes", qty: "500g", cat: "🌾" },
-    { item: "Boulgour ou semoule", qty: "500g", cat: "🌾" },
-  ],
-  legumes: [
-    { item: "Carottes", qty: "1 kg", cat: "🥕" },
-    { item: "Courgettes", qty: "4 pièces", cat: "🥬" },
-    { item: "Haricots verts", qty: "500g", cat: "🥬" },
-    { item: "Épinards frais ou surgelés", qty: "500g", cat: "🥬" },
-    { item: "Tomates cerises", qty: "1 barquette", cat: "🍅" },
-    { item: "Concombre", qty: "2 pièces", cat: "🥒" },
-    { item: "Salade verte", qty: "1 sachet", cat: "🥬" },
-  ],
-  fruits: [
-    { item: "Bananes", qty: "1 régime", cat: "🍌" },
-    { item: "Kiwis", qty: "6 pièces", cat: "🥝" },
-    { item: "Pommes", qty: "4 pièces", cat: "🍎" },
-    { item: "Oranges", qty: "4 pièces", cat: "🍊" },
-    { item: "Fruits rouges surgelés", qty: "1 sachet", cat: "🍓" },
-    { item: "Citrons", qty: "1 filet", cat: "🍋" },
-  ],
-  complements: [
-    { item: "Huile d'olive", qty: "1 bouteille", cat: "🫒" },
-    { item: "Amandes", qty: "200g", cat: "🥜" },
-    { item: "Noix", qty: "200g", cat: "🥜" },
-    { item: "Graines de courge", qty: "200g", cat: "🌱" },
-    { item: "Miel", qty: "1 pot", cat: "🍯" },
-    { item: "Lait végétal (avoine ou amande)", qty: "1L", cat: "🥛" },
-  ],
-  infusions: [
-    { item: "Gingembre frais", qty: "300g", cat: "🫚" },
-    { item: "Citrons (extra)", qty: "1 filet", cat: "🍋" },
-    { item: "Anis étoilé", qty: "1 sachet", cat: "🫖" },
-    { item: "Graines de fenouil", qty: "1 sachet", cat: "🫖" },
-    { item: "Menthe poivrée (sachets)", qty: "1 boîte", cat: "🌿" },
-    { item: "Camomille (sachets)", qty: "1 boîte", cat: "🌿" },
-    { item: "Curcuma en poudre", qty: "1 pot", cat: "🟡" },
-    { item: "Cannelle", qty: "1 pot", cat: "🟤" },
-  ],
-  epices: [
-    { item: "Cumin en poudre", qty: "1 pot", cat: "🟤" },
-    { item: "Paprika doux", qty: "1 pot", cat: "🔴" },
-    { item: "Coriandre en poudre", qty: "1 pot", cat: "🟢" },
-    { item: "Sel / Poivre (si toléré)", qty: "—", cat: "🧂" },
-  ],
-};
-
-const MEALS_WEEK = [
-  { jour: "Lun", pdej: "Flocons avoine + banane + 2 œufs + eau citron", dej: "Blanc poulet + riz basmati + carottes vapeur", din: "Steak bœuf halal + purée patate douce + courgettes", col: "Skyr + kiwi" },
-  { jour: "Mar", pdej: "2 œufs durs + pain complet + orange", dej: "Thon + quinoa + concombre + tomates + citron", din: "Cuisse poulet + haricots verts + riz complet", col: "Amandes + pomme" },
-  { jour: "Mer", pdej: "Flocons avoine + lait végétal + banane + miel", dej: "Dinde + lentilles corail (petite) + carottes", din: "Cabillaud + patate douce + épinards sautés", col: "Skyr + graines courge" },
-  { jour: "Jeu", pdej: "3 œufs + tomates + pain complet + thé", dej: "Poulet grillé + boulgour + salade + huile olive", din: "Bœuf haché + riz basmati + courgettes", col: "Banane + noix" },
-  { jour: "Ven", pdej: "Flocons avoine + banane + miel + citron", dej: "Thon + riz complet + poivrons + concombre", din: "Blanc poulet + quinoa + haricots verts", col: "Skyr + kiwi" },
-  { jour: "Sam", pdej: "2 œufs + pain complet + orange + thé", dej: "Côtelette agneau halal + semoule + carottes", din: "Poisson blanc + patate douce + épinards + ail", col: "Amandes + pomme" },
-  { jour: "Dim", pdej: "Flocons avoine + fruits rouges + 2 œufs", dej: "Poulet rôti + riz basmati + salade", din: "Bœuf haché + pâtes complètes + courgettes", col: "Skyr + banane" },
-];
-
-// ─── STORAGE HELPERS ───
-const getStorage = async (key) => {
-  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch { return null; }
-};
-const setStorage = async (key, val) => {
-  try { await window.storage.set(key, JSON.stringify(val)); } catch {}
-};
-
-// ─── COMPONENTS ───
-const Badge = ({ children, color = C.green }) => (
-  <span style={{ background: `${color}22`, color, border: `1px solid ${color}44`, borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>
-    {children}
-  </span>
-);
-
-const Card = ({ children, style = {} }) => (
-  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "20px 24px", ...style }}>
-    {children}
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-in">
+    <div><div class="brand">the_rebornlife</div><div class="hdr-title">Programme 2025+</div></div>
+    <div class="hdr-right"><div id="hdate"></div><div class="hdr-prog" id="hprog">0/9 tâches ✓</div></div>
   </div>
-);
+</div>
 
-const SectionTitle = ({ icon, title, sub }) => (
-  <div style={{ marginBottom: 20 }}>
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <span style={{ fontSize: 22 }}>{icon}</span>
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: C.text }}>{title}</h2>
-    </div>
-    {sub && <p style={{ margin: "4px 0 0 32px", color: C.textMuted, fontSize: 13 }}>{sub}</p>}
+<!-- TABS -->
+<div class="tabs">
+  <div class="tabs-in">
+    <button class="tb on" onclick="ST('today')">⚡ Aujourd'hui</button>
+    <button class="tb" onclick="ST('tracker')">📊 Tracker</button>
+    <button class="tb" onclick="ST('muscu')">💪 Muscu</button>
+    <button class="tb" onclick="ST('prog')">🏋️ Programme</button>
+    <button class="tb" onclick="ST('nutrition')">🌿 Nutrition</button>
+    <button class="tb" onclick="ST('shots')">🔥 Shots</button>
+    <button class="tb" onclick="ST('courses')">🛒 Courses</button>
+    <button class="tb" onclick="ST('progress')">📈 Progression</button>
   </div>
-);
+</div>
 
-// ─── TABS ───
-const TABS = [
-  { id: "today", label: "Aujourd'hui", icon: "⚡" },
-  { id: "tracker", label: "Tracker", icon: "📊" },
-  { id: "programme", label: "Programme", icon: "🏋️" },
-  { id: "nutrition", label: "Nutrition", icon: "🌿" },
-  { id: "shots", label: "Shots & Infusions", icon: "🔥" },
-  { id: "courses", label: "Courses", icon: "🛒" },
-  { id: "progress", label: "Progression", icon: "📈" },
+<div class="wrap">
+
+<!-- ═══ TODAY ═══ -->
+<div id="tab-today" class="pnl on">
+  <div class="card card-h" id="today-hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <p style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px" id="tlabel"></p>
+        <h1 style="font-size:21px;font-weight:800;margin:5px 0 6px" id="tseance"></h1>
+        <span id="tbadge"></span>
+      </div>
+      <div style="text-align:center"><div style="font-size:32px;font-weight:800" id="tpct">0%</div><div style="font-size:11px;color:var(--muted)">Routine</div></div>
+    </div>
+    <div class="pbar"><div class="pfill" id="tbar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">✅</span><div><h2>Routine du jour</h2><p>Coche au fur et à mesure</p></div></div>
+    <div id="tasklist"></div>
+  </div>
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">🍽️</span><h2>Repas du jour</h2></div>
+    <div class="mgrid" id="tmeals"></div>
+  </div>
+  <div class="card" style="border-color:rgba(46,204,113,.3)">
+    <div class="stitle"><span style="font-size:19px">🫖</span><h2>Infusion du soir</h2></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:17px;font-weight:700;color:var(--green)" id="tinf-nom"></div><div style="color:var(--muted);font-size:12px;margin-top:2px" id="tinf-mom"></div></div>
+      <span id="tinf-badge"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRACKER ═══ -->
+<div id="tab-tracker" class="pnl">
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">📝</span><div><h2>Saisie du jour</h2><p>Poids · Running · Ressenti</p></div></div>
+    <div class="tinputs">
+      <div class="igrp"><label>Date</label><input type="date" id="t-date"></div>
+      <div class="igrp"><label>Poids (kg)</label><input type="number" id="t-poids" step="0.1" placeholder="76.0"></div>
+      <div class="igrp"><label>Running (km)</label><input type="number" id="t-run" step="0.1" placeholder="3.0"></div>
+    </div>
+    <div class="igrp" style="margin-bottom:11px"><label>Notes / Ressenti</label><textarea id="t-notes" rows="2" placeholder="Comment tu te sens ?"></textarea></div>
+    <button class="btn-save" onclick="saveLog()">Sauvegarder</button>
+  </div>
+  <div class="sgrid" id="tstats" style="display:none"></div>
+  <div class="card" id="thist" style="display:none">
+    <div class="stitle"><span style="font-size:19px">📋</span><h2>Historique</h2></div>
+    <div id="loglist" style="max-height:280px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ═══ MUSCU TRACKER ═══ -->
+<div id="tab-muscu" class="pnl">
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">💪</span><div><h2>Suivi Musculation</h2><p>Enregistre tes charges par semaine</p></div></div>
+    <div style="margin-bottom:12px">
+      <div class="igrp"><label>Séance</label>
+        <select id="m-seance" onchange="renderMuscuForm()">
+          <option value="0">Lundi — Pecs · Épaules · Triceps</option>
+          <option value="2">Mercredi — Dos · Biceps</option>
+          <option value="4">Vendredi — Jambes · Fessiers</option>
+          <option value="6">Dimanche — Full body léger</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="color:var(--muted);font-size:11px;font-weight:600;display:block;margin-bottom:6px">SEMAINE</label>
+      <div class="week-selector" id="muscu-weeks"></div>
+    </div>
+    <div id="muscu-form"></div>
+    <button class="btn-save" style="margin-top:10px" onclick="saveMuscuLog()">Sauvegarder la séance</button>
+  </div>
+  <div class="card" id="muscu-hist" style="display:none">
+    <div class="stitle"><span style="font-size:19px">📈</span><h2>Progression par exercice</h2></div>
+    <div id="muscu-hist-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PROGRAMME ═══ -->
+<div id="tab-prog" class="pnl">
+  <div class="dgrid" id="prog-days"></div>
+  <div class="card" id="prog-detail"></div>
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">🌀</span><div><h2>Mobilité matinale — Tous les jours</h2><p>Trevorsinstinct x2 · 8 minutes</p></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Hindu squats 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Body waves 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Side bends 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">McGregors 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Chiropractors 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Aura farmers 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Arm circles 30s</div>
+      <div style="background:var(--surface);border-radius:7px;padding:7px 11px;border:1px solid var(--border);font-size:13px">Twists 30s</div>
+    </div>
+    <div class="inf-hl"><span style="color:var(--green);font-weight:600;font-size:13px">🫁 Vacuum ensuite</span><span style="color:var(--sub);font-size:13px"> · 5 respirations · expire tout · rentre ventre 10-20s</span></div>
+  </div>
+</div>
+
+<!-- ═══ NUTRITION ═══ -->
+<div id="tab-nutrition" class="pnl">
+  <div class="dgrid" id="nutri-days"></div>
+  <div id="nutri-meals"></div>
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">📋</span><h2>Règles clés</h2></div>
+    <div id="nutri-rules"></div>
+  </div>
+</div>
+
+<!-- ═══ SHOTS ═══ -->
+<div id="tab-shots" class="pnl">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px">
+    <button class="sectb on" onclick="switchShots('planning')" id="sb-planning"><span>📅 Quand ?</span></button>
+    <button class="sectb" onclick="switchShots('recettes')" id="sb-recettes"><span>🔥 Recettes</span></button>
+    <button class="sectb" onclick="switchShots('infusions')" id="sb-infusions"><span>🫖 Infusions</span></button>
+  </div>
+  <div id="shots-planning"></div>
+  <div id="shots-recettes" style="display:none"></div>
+  <div id="shots-infusions" style="display:none"></div>
+</div>
+
+<!-- ═══ COURSES ═══ -->
+<div id="tab-courses" class="pnl">
+  <div class="card card-h">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+      <div><div style="font-size:17px;font-weight:800">🛒 Liste de courses</div><div style="color:var(--muted);font-size:12px;margin-top:1px">Halal · Anti-fermentation</div></div>
+      <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green)" id="c-count">0/0</div><div style="font-size:10px;color:var(--muted)">cochés</div></div>
+    </div>
+    <div class="pbar"><div class="pfill" id="c-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div style="margin-bottom:10px"><label style="color:var(--muted);font-size:11px;font-weight:600;display:block;margin-bottom:5px">FILTRER PAR SEMAINE</label>
+    <div class="week-filter" id="week-filter"></div></div>
+    <div class="sec-tabs" id="c-cats"></div>
+    <div id="c-list"></div>
+    <button onclick="resetCourses()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:13px;cursor:pointer;margin-top:10px;font-family:inherit">Réinitialiser la liste</button>
+  </div>
+</div>
+
+<!-- ═══ PROGRESS ═══ -->
+<div id="tab-progress" class="pnl">
+  <!-- Objectifs long terme -->
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">🎯</span><h2>Objectifs long terme</h2></div>
+    <div class="prog-grid">
+      <div class="prog-card" style="border-top-color:var(--orange)"><div class="pc-lbl" style="color:var(--orange)">Fin juillet</div><div class="pc-val">🏃 5 km</div><div class="pc-val">💪 +1-2 kg</div></div>
+      <div class="prog-card" style="border-top-color:var(--green)"><div class="pc-lbl" style="color:var(--green)">Fin août</div><div class="pc-val">🏃 7 km</div><div class="pc-val">💪 +3-4 kg</div></div>
+      <div class="prog-card" style="border-top-color:var(--blue)"><div class="pc-lbl" style="color:var(--blue)">Septembre</div><div class="pc-val">🏃 10 km</div><div class="pc-val">🏅 Semi-marathon</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+      <div class="prog-card" style="border-top-color:var(--purple)"><div class="pc-lbl" style="color:var(--purple)">Fin 2025</div><div class="pc-val">🏃 Semi fait</div><div class="pc-val">💪 +5-6 kg</div></div>
+      <div class="prog-card" style="border-top-color:var(--orange)"><div class="pc-lbl" style="color:var(--orange)">Début 2026</div><div class="pc-val">🏃 Marathon ?</div><div class="pc-val">💪 Corps solide</div></div>
+      <div class="prog-card" style="border-top-color:var(--green)"><div class="pc-lbl" style="color:var(--green)">Continue...</div><div class="pc-val">🏆 Ton rythme</div><div class="pc-val">📈 Sans limite</div></div>
+    </div>
+  </div>
+  <!-- Semaine en cours -->
+  <div class="card" style="border-color:rgba(46,204,113,.3)">
+    <div class="stitle"><span style="font-size:19px">📍</span><h2 id="pw-title">Semaine 1</h2></div>
+    <div style="background:var(--gglow);border-radius:9px;padding:13px 15px;border:1px solid rgba(46,204,113,.2)" id="pw-detail"></div>
+  </div>
+  <!-- Timeline running illimitée -->
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">🏃</span><div><h2>Progression Running</h2><p>Départ : 3 km · Sans limite de date</p></div></div>
+    <div id="run-timeline"></div>
+  </div>
+  <!-- Stats poids -->
+  <div class="card">
+    <div class="stitle"><span style="font-size:19px">⚖️</span><div><h2>Évolution poids & Running</h2><p>Départ : 76 kg · Objectif : +4-5 kg lean</p></div></div>
+    <div id="poids-stats"></div>
+  </div>
+  <!-- Graph running -->
+  <div class="card" id="run-graph-card" style="display:none">
+    <div class="stitle"><span style="font-size:19px">📊</span><h2>Courbe Running</h2></div>
+    <canvas id="run-canvas" height="180"></canvas>
+  </div>
+</div>
+
+</div><!-- wrap -->
+
+<!-- EXO MODAL -->
+<div class="modal-bg" id="exo-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕ Fermer</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════
+// DATA
+// ══════════════════════════════
+const DAYS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const TI=new Date().getDay()===0?6:new Date().getDay()-1;
+
+const PROG=[
+  {type:'salle',label:'Pecs · Épaules · Triceps',color:'#2ECC71',icon:'🏋️'},
+  {type:'running',label:'Running autour du siège',color:'#F39C12',icon:'🏃'},
+  {type:'salle',label:'Dos · Biceps',color:'#3498DB',icon:'🏋️'},
+  {type:'repos',label:'Repos actif · Marche 30 min',color:'#9B59B6',icon:'🚶'},
+  {type:'salle',label:'Jambes · Fessiers',color:'#2ECC71',icon:'🏋️'},
+  {type:'running',label:'Running matinal avant 10h',color:'#F39C12',icon:'🏃'},
+  {type:'salle',label:'Full body léger + Batch cooking',color:'#1A7A4A',icon:'🏋️'},
 ];
 
-// ─── TODAY TAB ───
-function TodayTab({ tasks, toggleTask, todayLog }) {
-  const prog = PROGRAM[TODAY_IDX];
-  const inf = INFUSIONS[TODAY_IDX];
-  const meal = MEALS_WEEK[TODAY_IDX];
-  const done = tasks.filter(Boolean).length;
-  const pct = Math.round((done / ROUTINE_TASKS.length) * 100);
+const INF=[
+  {nom:'Anis étoilé',moment:'20h15 après dîner',fixed:true},
+  {nom:'Fenouil (optionnel)',moment:'Après dîner si ballonnements',fixed:false},
+  {nom:'Anis étoilé',moment:'20h15 après dîner',fixed:true},
+  {nom:'Menthe (midi)',moment:'Après déjeuner au boulot',fixed:false},
+  {nom:'Anis étoilé',moment:'20h45 après dîner',fixed:true},
+  {nom:'Anis / Fenouil',moment:'Après dîner',fixed:true},
+  {nom:'Anis étoilé',moment:'20h15 après dîner',fixed:true},
+];
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Header du jour */}
-      <Card style={{ background: `linear-gradient(135deg, ${C.card} 0%, #1A2035 100%)`, borderColor: prog.color + "44" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+const TASKS=[
+  {id:'eau',label:'Eau + citron au réveil',icon:'💧'},
+  {id:'mob',label:'Mobilité trevorsinstinct x2 (8 min)',icon:'🌀'},
+  {id:'vac',label:'Vacuum 5 respirations',icon:'🫁'},
+  {id:'pdej',label:'Petit-déjeuner + Oméga 3 + Magnésium',icon:'🍳'},
+  {id:'sport',label:'Séance sport du jour',icon:'⚡'},
+  {id:'elec',label:'Électrolytes pendant l\'effort',icon:'💧'},
+  {id:'creat',label:'Créatine 3g avec le dîner',icon:'💊'},
+  {id:'inf',label:'Infusion du soir',icon:'🫖'},
+  {id:'lit',label:'Au lit avant 23h · téléphone hors chambre',icon:'😴'},
+];
+
+const MEALS=[
+  {j:'Lun',p:'Flocons avoine + banane + 2 œufs + eau citron',d:'Blanc poulet + riz basmati + carottes vapeur',n:'Steak bœuf halal + purée patate douce + courgettes',c:'Fromage blanc 0% + kiwi'},
+  {j:'Mar',p:'2 œufs durs + pain complet + orange',d:'Thon + quinoa + concombre + tomates cerises',n:'Cuisse poulet + haricots verts + riz complet',c:'Amandes + pomme'},
+  {j:'Mer',p:'Flocons avoine + lait végétal + banane + miel',d:'Dinde + lentilles corail + carottes',n:'Cabillaud + patate douce + épinards sautés',c:'Fromage blanc 0% + graines courge'},
+  {j:'Jeu',p:'3 œufs + tomates + pain complet + thé',d:'Poulet grillé + boulgour + salade + huile olive',n:'Bœuf haché halal + riz basmati + courgettes',c:'Banane + noix'},
+  {j:'Ven',p:'Flocons avoine + banane + miel + citron',d:'Thon + riz complet + concombre + tomates cerises',n:'Blanc poulet + quinoa + haricots verts',c:'Fromage blanc 0% + kiwi'},
+  {j:'Sam',p:'2 œufs + pain complet + orange + thé',d:'Côtelette agneau halal + semoule + carottes',n:'Poisson blanc + patate douce + épinards + ail',c:'Amandes + pomme'},
+  {j:'Dim',p:'Flocons avoine + fruits rouges + 2 œufs',d:'Poulet rôti + riz basmati + salade verte',n:'Bœuf haché + pâtes complètes + courgettes',c:'Fromage blanc 0% + banane'},
+];
+
+// Exercices avec fiche + alternatives
+const SALLE={
+  0:[
+    {ex:'Développé couché barre',s:'4',r:'8-10',rp:'90s',
+     desc:'Allongé sur le banc, pieds au sol, dos plat. Saisir la barre légèrement plus large que les épaules. Descendre la barre vers le milieu de la poitrine en contrôlant, puis pousser jusqu\'à extension complète.',
+     muscles:'Pectoraux · Deltoïdes antérieurs · Triceps',
+     tips:'Garde les omoplates serrées · Descente lente 2-3s · Pas de rebond sur la poitrine',
+     alts:['Développé couché haltères','Pompes lestées','Développé sur machine Smith'],
+     svg:'bench'},
+    {ex:'Développé incliné haltères',s:'3',r:'10-12',rp:'75s',
+     desc:'Banc incliné à 30-45°. Haltères au niveau des épaules, coudes à 45°. Pousser vers le haut en convergent légèrement. Descendre lentement en sentant l\'étirement du pectoral.',
+     muscles:'Pectoraux supérieurs · Deltoïdes antérieurs',
+     tips:'Angle 30° max pour protéger les épaules · Contraction en haut 1s',
+     alts:['Développé incliné barre','Câbles croisés haut','Machine chest press inclinée'],
+     svg:'incline'},
+    {ex:'Écartés poulies (cables)',s:'3',r:'12-15',rp:'60s',
+     desc:'Debout entre les poulies réglées en haut. Bras légèrement fléchis, partir les bras écartés puis les ramener devant toi en arc de cercle. Contraction maximale au centre.',
+     muscles:'Pectoraux (isolation) · Deltoïdes antérieurs',
+     tips:'Pas de momentum · Contraction forte en position fermée · Poids léger',
+     alts:['Écartés haltères sur banc plat','Pec deck machine','Pompes diamant'],
+     svg:'cable'},
+    {ex:'Développé militaire haltères',s:'4',r:'8-10',rp:'90s',
+     desc:'Assis ou debout, haltères à hauteur d\'épaules, paumes vers l\'avant. Pousser vers le haut jusqu\'à extension quasi-complète. Descendre à hauteur d\'oreilles.',
+     muscles:'Deltoïdes · Trapèzes · Triceps',
+     tips:'Core gainé · Pas de cambrure lombaire · Coudes légèrement devant',
+     alts:['Presse à épaules machine','Développé militaire barre','Arnold press haltères'],
+     svg:'military'},
+    {ex:'Élévations latérales',s:'3',r:'12-15',rp:'60s',
+     desc:'Debout, haltères légers. Bras le long du corps, soulever latéralement jusqu\'à hauteur d\'épaules. Descendre lentement. Le petit doigt légèrement plus haut que le pouce.',
+     muscles:'Deltoïdes latéraux (médians)',
+     tips:'Poids très léger · Pas de balancement · Lent et contrôlé · Coudes légèrement fléchis',
+     alts:['Élévations latérales câble','Machine latérale','Face pulls câble'],
+     svg:'lateral'},
+    {ex:'Dips / Extension triceps',s:'3',r:'10-12',rp:'75s',
+     desc:'Sur barre ou machine. Buste droit (pas penché avant) pour cibler les triceps. Descendre jusqu\'à 90° aux coudes. Remonter en extension complète.',
+     muscles:'Triceps (3 chefs) · Pectoraux secondairement',
+     tips:'Buste droit = triceps · Penché avant = pecs · Extension complète',
+     alts:['Extension triceps poulie haute','Skull crushers','Kickback haltère'],
+     svg:'dips'},
+  ],
+  2:[
+    {ex:'Tractions / Tirage vertical',s:'4',r:'8-10',rp:'90s',
+     desc:'Prise pronation (paumes vers l\'avant) légèrement plus large que les épaules. Tirer jusqu\'à ce que la barre touche la clavicule. Étirement complet en bas entre chaque répétition.',
+     muscles:'Grand dorsal · Biceps · Rhomboïdes',
+     tips:'Étirement complet en bas · Pas de momentum · Omoplates vers le bas',
+     alts:['Tirage vertical machine','Tractions prise neutre','Tirage à la corde'],
+     svg:'pulldown'},
+    {ex:'Rowing barre (Yates)',s:'4',r:'8-10',rp:'90s',
+     desc:'Dos légèrement incliné vers l\'avant (30-45°). Tirer la barre vers le nombril en serrant les coudes près du corps. Descente contrôlée en 2-3 secondes.',
+     muscles:'Grand dorsal · Rhomboïdes · Biceps',
+     tips:'Dos neutre · Tirer vers nombril (pas vers poitrine) · Épaules fixes',
+     alts:['Rowing haltère unilatéral','Rowing machine assise','Rowing câble bas'],
+     svg:'row'},
+    {ex:'Tirage horizontal câble',s:'3',r:'10-12',rp:'75s',
+     desc:'Assis face à la poulie basse, poignée neutre. Tirer vers le ventre en ramenant les coudes derrière le dos. Omoplates qui se rejoignent en fin de mouvement.',
+     muscles:'Grand dorsal · Rhomboïdes · Biceps',
+     tips:'Dos droit · Pas de balancement · Contraction omoplate en fin',
+     alts:['Rowing machine assise','Tirage à la corde','Rowing haltère un bras'],
+     svg:'seated_row'},
+    {ex:'Pull-over haltère',s:'3',r:'12-15',rp:'60s',
+     desc:'Allongé sur un banc (en travers ou dans le sens), tenir un haltère à deux mains. Descendre les bras au-delà de la tête en arc, puis remonter. Étirement du grand dorsal.',
+     muscles:'Grand dorsal · Pectoraux · Dentelé antérieur',
+     tips:'Coudes légèrement fléchis · Amplitude maximale · Respiration contrôlée',
+     alts:['Pull-over câble poulie haute','Pull-over machine','Tirage bras tendus câble'],
+     svg:'pullover'},
+    {ex:'Curl barre droite',s:'4',r:'8-10',rp:'75s',
+     desc:'Debout, prise supination (paumes vers le haut). Coudes fixes contre le corps. Fléchir les avant-bras jusqu\'en haut. Descente lente et complète.',
+     muscles:'Biceps brachial · Brachial antérieur',
+     tips:'Coudes immobiles · Contraction maximale en haut · Pas de balancement',
+     alts:['Curl haltères alterné','Curl câble bas','Curl marteau (brachial)'],
+     svg:'curl'},
+    {ex:'Curl haltères + marteau',s:'3',r:'10-12',rp:'60s',
+     desc:'Curl classique : supination en montant. Marteau : prise neutre tout le long. Alterne entre les deux ou fais une série de chaque. Coudes fixes.',
+     muscles:'Biceps · Brachial antérieur · Brachioradial',
+     tips:'Alterner les deux styles dans la série · Contraction à chaque rep',
+     alts:['Curl câble','Curl barre EZ','Curl incliné haltères'],
+     svg:'hammer'},
+  ],
+  4:[
+    {ex:'Squat barre / Goblet',s:'4',r:'8-10',rp:'120s',
+     desc:'Pieds écartés largeur épaules, orteils légèrement ouverts. Descendre jusqu\'à 90° (ou plus bas si mobilité ok) en gardant le dos droit et les genoux dans l\'axe des pieds.',
+     muscles:'Quadriceps · Fessiers · Ischio-jambiers · Core',
+     tips:'Genoux dans l\'axe · Dos droit · Talons au sol · Descente 3s',
+     alts:['Presse à cuisses','Hack squat machine','Fentes statiques'],
+     svg:'squat'},
+    {ex:'Presse à cuisses',s:'4',r:'10-12',rp:'90s',
+     desc:'Sur la machine, pieds à largeur d\'épaules à mi-hauteur de la plateforme. Descendre jusqu\'à 90° aux genoux. Pousser sans verrouiller les genoux en haut.',
+     muscles:'Quadriceps · Fessiers · Ischio-jambiers',
+     tips:'Pieds hauts = fessiers · Pieds bas = quadriceps · Genoux ne rentrent pas',
+     alts:['Hack squat','Squat barre','Bulgarian split squat'],
+     svg:'legpress'},
+    {ex:'Fentes marchées haltères',s:'3',r:'12/jambe',rp:'75s',
+     desc:'Debout avec haltères. Faire un grand pas en avant, descendre le genou arrière vers le sol (sans toucher), puis pousser pour ramener le pied avant et recommencer de l\'autre côté.',
+     muscles:'Quadriceps · Fessiers · Ischio-jambiers · Équilibre',
+     tips:'Grand pas · Genou avant ne dépasse pas le pied · Dos droit vertical',
+     alts:['Fentes statiques','Fentes arrière','Step-up boîte'],
+     svg:'lunge'},
+    {ex:'Leg curl couché',s:'3',r:'12-15',rp:'60s',
+     desc:'Allongé sur la machine, cheville sous le rouleau. Fléchir les jambes en contractant les ischio-jambiers. Pause 1s en haut. Descente lente en 2-3 secondes.',
+     muscles:'Ischio-jambiers · Gastrocnémiens',
+     tips:'Descente lente = clé · Hanches plaquées contre la machine · Contraction en haut',
+     alts:['Leg curl assis machine','Romanian deadlift haltères','Good morning'],
+     svg:'legcurl'},
+    {ex:'Hip thrust barre',s:'4',r:'10-12',rp:'75s',
+     desc:'Dos appuyé sur un banc, barre sur les hanches avec un pad. Pousser les hanches vers le haut en contractant les fessiers. Position haute : corps horizontal. Squeeze en haut 1s.',
+     muscles:'Fessiers (grand et moyen) · Ischio-jambiers',
+     tips:'Squeeze fessiers en haut · Menton vers la poitrine · Pied à plat au sol',
+     alts:['Hip thrust poids de corps','Glute bridge sol','Cable kickback'],
+     svg:'hipthrust'},
+    {ex:'Mollets debout machine',s:'4',r:'15-20',rp:'45s',
+     desc:'Sur la machine mollets debout, épaules sous les appuis. Se mettre sur les pointes des pieds en amplitude complète. Descendre jusqu\'à l\'étirement total du mollet. Mouvement lent.',
+     muscles:'Gastrocnémiens · Soléaire',
+     tips:'Amplitude TOTALE · Étirement complet en bas · Contraction en haut',
+     alts:['Mollets assis machine','Mollets debout avec haltère','Mollets sur step'],
+     svg:'calves'},
+  ],
+  6:[
+    {ex:'Gainage planche',s:'3',r:'45s',rp:'45s',
+     desc:'Sur les avant-bras et les orteils. Corps en ligne droite de la tête aux talons. Regard vers le sol. Contracter le ventre, les fessiers et les cuisses pour maintenir la position.',
+     muscles:'Core complet · Deltoïdes · Fessiers',
+     tips:'Pas de cambrure · Pas de fesses en l\'air · Respiration régulière',
+     alts:['Gainage latéral','Planche dynamique','Ab wheel'],
+     svg:'plank'},
+    {ex:'Pompes prise large',s:'3',r:'15-20',rp:'60s',
+     desc:'Mains plus larges que les épaules. Corps en planche. Descendre jusqu\'à ce que la poitrine frôle le sol. Pousser jusqu\'à extension complète. Coudes à 45° du corps.',
+     muscles:'Pectoraux · Triceps · Deltoïdes antérieurs',
+     tips:'Corps rigide · Amplitude complète · Rythme régulier',
+     alts:['Pompes classiques','Pompes sur genoux','Pompes avec pieds surélevés'],
+     svg:'pushup'},
+    {ex:'Tirage câble léger',s:'3',r:'15-20',rp:'60s',
+     desc:'60% de ta charge habituelle. Focus sur la sensation musculaire plutôt que la performance. Dos droit, omoplates qui se rejoignent en fin de mouvement.',
+     muscles:'Grand dorsal · Rhomboïdes · Biceps',
+     tips:'Récupération active · Pas de charge lourde aujourd\'hui · Sensation > performance',
+     alts:['Tirage élastique','Rowing haltère léger','Face pulls'],
+     svg:'light_cable'},
+    {ex:'Squat poids de corps',s:'3',r:'20',rp:'45s',
+     desc:'Sans charge, focus sur la mobilité et la technique. Descente lente sur 3 secondes. Pause en bas. Remontée explosive. Travail de la charnière hanche-genou.',
+     muscles:'Quadriceps · Fessiers · Mobilité',
+     tips:'Descente 3s · Pause 1s en bas · Focus technique parfaite',
+     alts:['Squat sauté','Pistol squat (si niveau)','Wall squat'],
+     svg:'bw_squat'},
+    {ex:'Hip thrust poids de corps',s:'3',r:'20',rp:'45s',
+     desc:'Sans barre. Dos sur le banc, pieds à plat, hanches qui montent vers le plafond. Squeeze des fessiers en haut. Excellente activation en récupération.',
+     muscles:'Fessiers · Ischio-jambiers',
+     tips:'Contraction en haut à chaque rep · Récupération active des fessiers post-vendredi',
+     alts:['Glute bridge sol','Cable kickback','Donkey kicks'],
+     svg:'bw_hip'},
+    {ex:'Étirements globaux',s:'1',r:'15 min',rp:'—',
+     desc:'Cuissots, pectoraux, dos, épaules en statique. 30s par position minimum. Respiration profonde. C\'est la partie la plus importante pour la récupération et la progression.',
+     muscles:'Récupération globale · Flexibilité · Prévention blessures',
+     tips:'Jamais à froid · Étirement statique = après sport · Respiration profonde',
+     alts:['Yoga recovery','Foam roller','Étirements PNF'],
+     svg:'stretch'},
+  ],
+};
+
+// SVG illustrations (simplified anatomical drawings)
+const SVG_EXOS = {
+  bench: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Développé couché barre</text>
+    <!-- bench --> <rect x="60" y="110" width="180" height="12" rx="4" fill="#2ECC71" opacity=".4"/>
+    <rect x="60" y="120" width="12" height="30" rx="3" fill="#2ECC71" opacity=".3"/>
+    <rect x="228" y="120" width="12" height="30" rx="3" fill="#2ECC71" opacity=".3"/>
+    <!-- body --> <ellipse cx="150" cy="100" rx="18" ry="12" fill="#3498DB" opacity=".6"/>
+    <rect x="132" y="100" width="36" height="30" rx="6" fill="#3498DB" opacity=".5"/>
+    <!-- arms --> <line x1="132" y1="105" x2="90" y2="90" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="168" y1="105" x2="210" y2="90" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- bar --> <line x1="70" y1="88" x2="230" y2="88" stroke="#E8EAF0" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="70" cy="88" r="8" fill="#E74C3C" opacity=".7"/>
+    <circle cx="230" cy="88" r="8" fill="#E74C3C" opacity=".7"/>
+    <!-- arrows --> <line x1="150" y1="88" x2="150" y2="70" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <polygon points="150,62 145,72 155,72" fill="#F39C12"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">↑ Pousser vers le haut</text></svg>`,
+
+  incline: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Développé incliné haltères</text>
+    <!-- bench incliné --> <rect x="60" y="80" width="180" height="10" rx="3" fill="#2ECC71" opacity=".4" transform="rotate(-20,150,85)"/>
+    <!-- body incliné --> <ellipse cx="130" cy="85" rx="16" ry="11" fill="#3498DB" opacity=".6" transform="rotate(-20,130,90)"/>
+    <!-- arms --> <line x1="118" y1="88" x2="85" y2="68" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="148" y1="82" x2="185" y2="62" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- haltères --> <rect x="75" y="62" width="20" height="8" rx="3" fill="#E8EAF0" opacity=".6"/>
+    <rect x="175" y="56" width="20" height="8" rx="3" fill="#E8EAF0" opacity=".6"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Angle 30-45° · Pousser en convergent</text></svg>`,
+
+  military: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Développé militaire</text>
+    <!-- body --> <ellipse cx="150" cy="60" rx="14" ry="16" fill="#3498DB" opacity=".6"/>
+    <rect x="136" y="74" width="28" height="55" rx="5" fill="#3498DB" opacity=".5"/>
+    <rect x="136" y="125" width="14" height="35" rx="4" fill="#3498DB" opacity=".4"/>
+    <rect x="150" y="125" width="14" height="35" rx="4" fill="#3498DB" opacity=".4"/>
+    <!-- arms down (start) --> <line x1="136" y1="85" x2="100" y2="95" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <line x1="164" y1="85" x2="200" y2="95" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <!-- arms up (end) --> <line x1="136" y1="80" x2="105" y2="45" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="164" y1="80" x2="195" y2="45" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- haltères haut --> <rect x="95" y="38" width="18" height="7" rx="3" fill="#E8EAF0" opacity=".7"/>
+    <rect x="187" y="38" width="18" height="7" rx="3" fill="#E8EAF0" opacity=".7"/>
+    <polygon points="150,10 145,22 155,22" fill="#F39C12"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Pousser vers le haut · Core gainé</text></svg>`,
+
+  lateral: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Élévations latérales</text>
+    <ellipse cx="150" cy="55" rx="14" ry="16" fill="#3498DB" opacity=".6"/>
+    <rect x="136" y="69" width="28" height="50" rx="5" fill="#3498DB" opacity=".5"/>
+    <rect x="136" y="115" width="13" height="35" rx="4" fill="#3498DB" opacity=".4"/>
+    <rect x="151" y="115" width="13" height="35" rx="4" fill="#3498DB" opacity=".4"/>
+    <!-- arms low (start) --> <line x1="136" y1="80" x2="112" y2="90" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="3,2"/>
+    <line x1="164" y1="80" x2="188" y2="90" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="3,2"/>
+    <!-- arms lateral (end) --> <line x1="136" y1="78" x2="90" y2="65" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="164" y1="78" x2="210" y2="65" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="85" cy="63" r="6" fill="#F39C12" opacity=".7"/>
+    <circle cx="215" cy="63" r="6" fill="#F39C12" opacity=".7"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Montée lente · Hauteur épaule max</text></svg>`,
+
+  squat: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Squat barre</text>
+    <!-- standing (dashed) -->
+    <ellipse cx="150" cy="45" rx="13" ry="14" fill="#6B7280" opacity=".3"/>
+    <rect x="137" y="57" width="26" height="35" rx="5" fill="#6B7280" opacity=".2"/>
+    <line x1="137" y1="92" x2="120" y2="130" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <line x1="163" y1="92" x2="180" y2="130" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <!-- squatted (solid) -->
+    <ellipse cx="150" cy="60" rx="13" ry="14" fill="#3498DB" opacity=".7"/>
+    <rect x="137" y="72" width="26" height="25" rx="5" fill="#3498DB" opacity=".6"/>
+    <line x1="137" y1="97" x2="108" y2="130" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="163" y1="97" x2="192" y2="130" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="108" y1="130" x2="118" y2="155" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="192" y1="130" x2="182" y2="155" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <!-- bar --> <line x1="100" y1="68" x2="200" y2="68" stroke="#E8EAF0" stroke-width="5"/>
+    <circle cx="100" cy="68" r="7" fill="#E74C3C" opacity=".7"/>
+    <circle cx="200" cy="68" r="7" fill="#E74C3C" opacity=".7"/>
+    <text x="150" y="168" text-anchor="middle" fill="#2ECC71" font-size="11">90° aux genoux · Dos droit · Talons au sol</text></svg>`,
+
+  hipthrust: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Hip thrust barre</text>
+    <!-- bench --> <rect x="55" y="95" width="80" height="14" rx="4" fill="#2ECC71" opacity=".4"/>
+    <!-- body --> <ellipse cx="100" cy="90" rx="18" ry="11" fill="#3498DB" opacity=".6"/>
+    <rect x="118" y="88" width="40" height="22" rx="6" fill="#3498DB" opacity=".5"/>
+    <!-- legs up --> <line x1="158" y1="100" x2="195" y2="75" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="195" y1="75" x2="210" y2="120" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <rect x="200" y="118" width="30" height="10" rx="3" fill="#2ECC71" opacity=".4"/>
+    <!-- bar --> <line x1="140" y1="92" x2="200" y2="92" stroke="#E8EAF0" stroke-width="5"/>
+    <circle cx="200" cy="92" r="8" fill="#E74C3C" opacity=".7"/>
+    <!-- arrow up --> <line x1="158" y1="100" x2="165" y2="70" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <polygon points="165,62 160,73 170,73" fill="#F39C12"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Squeeze fessiers en haut · Corps horizontal</text></svg>`,
+
+  curl: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Curl barre droite</text>
+    <ellipse cx="150" cy="50" rx="13" ry="15" fill="#3498DB" opacity=".6"/>
+    <rect x="137" y="63" width="26" height="50" rx="5" fill="#3498DB" opacity=".5"/>
+    <rect x="137" y="109" width="12" height="45" rx="4" fill="#3498DB" opacity=".4"/>
+    <rect x="151" y="109" width="12" height="45" rx="4" fill="#3498DB" opacity=".4"/>
+    <!-- arm low (start) --> <line x1="137" y1="78" x2="112" y2="120" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <line x1="163" y1="78" x2="188" y2="120" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <!-- arm curled (end) --> <line x1="137" y1="75" x2="105" y2="78" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="163" y1="75" x2="195" y2="78" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- bar --> <line x1="95" y1="78" x2="205" y2="78" stroke="#E8EAF0" stroke-width="5"/>
+    <circle cx="95" cy="78" r="7" fill="#E74C3C" opacity=".7"/>
+    <circle cx="205" cy="78" r="7" fill="#E74C3C" opacity=".7"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Coudes fixes · Contraction maximale en haut</text></svg>`,
+
+  plank: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Gainage planche</text>
+    <!-- floor --> <line x1="40" y1="140" x2="260" y2="140" stroke="#1F2535" stroke-width="3"/>
+    <!-- body plank --> <line x1="60" y1="110" x2="240" y2="105" stroke="#2ECC71" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+    <!-- head --> <ellipse cx="240" cy="100" rx="14" ry="13" fill="#3498DB" opacity=".6"/>
+    <!-- forearms --> <line x1="80" y1="110" x2="80" y2="140" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="120" y1="109" x2="120" y2="140" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <!-- feet --> <line x1="62" y1="113" x2="55" y2="140" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/>
+    <line x1="68" y1="113" x2="70" y2="140" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/>
+    <!-- arrow down (hips) --> <line x1="150" y1="100" x2="150" y2="135" stroke="#E74C3C" stroke-width="2" stroke-dasharray="4,2"/>
+    <text x="150" y="80" text-anchor="middle" fill="#E74C3C" font-size="10">← Corps en ligne droite →</text>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Dos plat · Fessiers serrés · Respiration</text></svg>`,
+
+  legpress: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Presse à cuisses</text>
+    <!-- machine seat --> <rect x="30" y="100" width="80" height="50" rx="6" fill="#2ECC71" opacity=".2" stroke="#2ECC71" stroke-width="1" stroke-opacity=".4"/>
+    <!-- platform --> <rect x="180" y="70" width="90" height="50" rx="6" fill="#1F2535" stroke="#2ECC71" stroke-width="1" stroke-opacity=".3"/>
+    <!-- legs --> <line x1="110" y1="130" x2="180" y2="100" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="110" y1="140" x2="180" y2="115" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <!-- feet on platform --> <rect x="178" y="95" width="20" height="10" rx="3" fill="#F39C12" opacity=".7"/>
+    <rect x="178" y="110" width="20" height="10" rx="3" fill="#F39C12" opacity=".7"/>
+    <!-- body --> <rect x="40" y="85" width="25" height="50" rx="5" fill="#3498DB" opacity=".5"/>
+    <!-- arrows --> <line x1="180" y1="95" x2="160" y2="80" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <line x1="160" y1="80" x2="200" y2="80" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">90° aux genoux · Pieds à plat · Pousser</text></svg>`,
+
+  lunge: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Fentes marchées haltères</text>
+    <!-- floor --> <line x1="40" y1="155" x2="260" y2="155" stroke="#1F2535" stroke-width="3"/>
+    <!-- body --> <ellipse cx="165" cy="55" rx="13" ry="14" fill="#3498DB" opacity=".6"/>
+    <rect x="152" y="67" width="26" height="35" rx="5" fill="#3498DB" opacity=".5"/>
+    <!-- front leg --> <line x1="152" y1="100" x2="120" y2="135" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="120" y1="135" x2="110" y2="155" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- back leg --> <line x1="178" y1="100" x2="205" y2="120" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="205" y1="120" x2="215" y2="155" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- haltères --> <rect x="130" y="85" width="15" height="7" rx="3" fill="#E8EAF0" opacity=".6"/>
+    <rect x="188" y="85" width="15" height="7" rx="3" fill="#E8EAF0" opacity=".6"/>
+    <!-- knee angle --> <text x="115" y="148" fill="#F39C12" font-size="10">90°</text>
+    <text x="150" y="170" text-anchor="middle" fill="#2ECC71" font-size="11">Grand pas · Dos droit · Genou ne dépasse pas le pied</text></svg>`,
+
+  pulldown: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Tirage vertical / Tractions</text>
+    <!-- bar --> <line x1="80" y1="40" x2="220" y2="40" stroke="#E8EAF0" stroke-width="5"/>
+    <circle cx="80" cy="40" r="7" fill="#E74C3C" opacity=".7"/>
+    <circle cx="220" cy="40" r="7" fill="#E74C3C" opacity=".7"/>
+    <!-- arms up --> <line x1="100" y1="40" x2="130" y2="75" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="200" y1="40" x2="170" y2="75" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <!-- body --> <ellipse cx="150" cy="80" rx="16" ry="14" fill="#3498DB" opacity=".7"/>
+    <rect x="134" y="92" width="32" height="45" rx="6" fill="#3498DB" opacity=".5"/>
+    <rect x="134" y="133" width="15" height="35" rx="4" fill="#3498DB" opacity=".4"/>
+    <rect x="151" y="133" width="15" height="35" rx="4" fill="#3498DB" opacity=".4"/>
+    <!-- arrow down --> <line x1="150" y1="80" x2="150" y2="52" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <polygon points="150,45 145,57 155,57" fill="#F39C12"/>
+    <text x="150" y="175" text-anchor="middle" fill="#2ECC71" font-size="11">Tirer vers la clavicule · Étirement complet en bas</text></svg>`,
+
+  row: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Rowing barre (Yates)</text>
+    <!-- body incliné --> <ellipse cx="155" cy="80" rx="15" ry="13" fill="#3498DB" opacity=".6"/>
+    <rect x="145" y="91" width="26" height="40" rx="5" fill="#3498DB" opacity=".5" transform="rotate(-30,158,111)"/>
+    <line x1="155" y1="125" x2="130" y2="155" stroke="#3498DB" stroke-width="7" stroke-linecap="round" opacity=".4"/>
+    <line x1="168" y1="125" x2="185" y2="155" stroke="#3498DB" stroke-width="7" stroke-linecap="round" opacity=".4"/>
+    <!-- arms pulling --> <line x1="145" y1="88" x2="105" y2="100" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="165" y1="85" x2="205" y2="97" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <!-- bar --> <line x1="95" y1="100" x2="215" y2="100" stroke="#E8EAF0" stroke-width="5"/>
+    <circle cx="95" cy="100" r="7" fill="#E74C3C" opacity=".7"/>
+    <circle cx="215" cy="100" r="7" fill="#E74C3C" opacity=".7"/>
+    <text x="150" y="170" text-anchor="middle" fill="#2ECC71" font-size="11">Tirer vers le nombril · Dos neutre</text></svg>`,
+
+  legcurl: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Leg curl couché</text>
+    <!-- machine bench --> <rect x="50" y="90" width="200" height="14" rx="4" fill="#2ECC71" opacity=".3"/>
+    <!-- body --> <rect x="70" y="75" width="100" height="20" rx="5" fill="#3498DB" opacity=".5"/>
+    <ellipse cx="185" cy="83" rx="14" ry="13" fill="#3498DB" opacity=".6"/>
+    <!-- legs straight (dashed) --> <line x1="70" y1="90" x2="50" y2="90" stroke="#6B7280" stroke-width="6" stroke-linecap="round" stroke-dasharray="4,2"/>
+    <!-- legs curled (solid) --> <line x1="70" y1="90" x2="55" y2="80" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <line x1="55" y1="80" x2="60" y2="55" stroke="#2ECC71" stroke-width="7" stroke-linecap="round"/>
+    <!-- roller --> <circle cx="62" cy="53" r="8" fill="#E74C3C" opacity=".6"/>
+    <!-- arrow --> <line x1="60" y1="65" x2="55" y2="45" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <polygon points="55,38 50,50 60,50" fill="#F39C12"/>
+    <text x="150" y="140" text-anchor="middle" fill="#2ECC71" font-size="11">Contracter les ischio-jambiers</text>
+    <text x="150" y="158" text-anchor="middle" fill="#6B7280" font-size="10">Descente lente 2-3s · Contraction en haut</text></svg>`,
+
+  calves: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Mollets debout machine</text>
+    <!-- body --> <ellipse cx="150" cy="50" rx="14" ry="15" fill="#3498DB" opacity=".6"/>
+    <rect x="136" y="63" width="28" height="50" rx="5" fill="#3498DB" opacity=".5"/>
+    <!-- legs --> <line x1="136" y1="110" x2="128" y2="148" stroke="#3498DB" stroke-width="7" stroke-linecap="round" opacity=".5"/>
+    <line x1="164" y1="110" x2="172" y2="148" stroke="#3498DB" stroke-width="7" stroke-linecap="round" opacity=".5"/>
+    <!-- low (flat, dashed) --> <line x1="128" y1="148" x2="118" y2="162" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="3,2"/>
+    <line x1="172" y1="148" x2="182" y2="162" stroke="#6B7280" stroke-width="5" stroke-linecap="round" stroke-dasharray="3,2"/>
+    <!-- high (on tip toes) --> <line x1="128" y1="148" x2="122" y2="145" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="172" y1="148" x2="178" y2="145" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="122" cy="143" rx="7" ry="4" fill="#2ECC71" opacity=".7"/>
+    <ellipse cx="178" cy="143" rx="7" ry="4" fill="#2ECC71" opacity=".7"/>
+    <!-- arrows --> <line x1="140" y1="120" x2="140" y2="100" stroke="#F39C12" stroke-width="2" stroke-dasharray="4,2"/>
+    <polygon points="140,93 135,104 145,104" fill="#F39C12"/>
+    <text x="150" y="175" text-anchor="middle" fill="#2ECC71" font-size="11">Amplitude totale · Étirement complet en bas</text></svg>`,
+
+  pushup: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Pompes prise large</text>
+    <line x1="40" y1="148" x2="260" y2="148" stroke="#1F2535" stroke-width="3"/>
+    <!-- body planche --> <line x1="65" y1="105" x2="235" y2="100" stroke="#2ECC71" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+    <ellipse cx="240" cy="95" rx="13" ry="12" fill="#3498DB" opacity=".6"/>
+    <!-- arms large --> <line x1="90" y1="105" x2="65" y2="148" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="120" y1="104" x2="95" y2="148" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="185" y1="103" x2="210" y2="148" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="215" y1="102" x2="240" y2="148" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <!-- feet --> <ellipse cx="65" cy="105" rx="7" ry="4" fill="#F39C12" opacity=".6"/>
+    <!-- width indicator --> <line x1="65" y1="155" x2="240" y2="155" stroke="#F39C12" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="152" y="168" text-anchor="middle" fill="#F39C12" font-size="10">← Prise large →</text></svg>`,
+
+  // Generic fallback
+  cable: `<svg viewBox="0 0 300 180" class="exo-svg"><rect x="0" y="0" width="300" height="180" fill="#13161E" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" fill="#6B7280" font-size="12">Exercice câble / poulie</text>
+    <ellipse cx="150" cy="75" rx="20" ry="22" fill="#3498DB" opacity=".5"/>
+    <rect x="130" y="95" width="40" height="50" rx="7" fill="#3498DB" opacity=".4"/>
+    <line x1="130" y1="110" x2="80" y2="90" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <line x1="170" y1="110" x2="220" y2="90" stroke="#2ECC71" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="75" cy="88" r="8" fill="#E74C3C" opacity=".6"/>
+    <circle cx="225" cy="88" r="8" fill="#E74C3C" opacity=".6"/>
+    <text x="150" y="165" text-anchor="middle" fill="#2ECC71" font-size="11">Contraction contrôlée · Amplitude complète</text></svg>`,
+};
+
+// Running weeks — unlimited
+const RUN_WEEKS=[
+  {s:'S1 (1-7 jul)',d:'3 → 3,5 km',c:'Retrouver le rythme'},
+  {s:'S2 (8-14 jul)',d:'3,5 → 4 km',c:'Régularité'},
+  {s:'S3 (15-21 jul)',d:'4 → 4,5 km',c:'Collectif boost'},
+  {s:'S4 (22-31 jul)',d:'4,5 → 5 km',c:'✅ Objectif juillet'},
+  {s:'S5-S6 (août)',d:'5 → 6,5 km',c:'Foulée installée'},
+  {s:'S7-S8 (août)',d:'6,5 → 7 km',c:'✅ Objectif août'},
+  {s:'S9-S10 (sept)',d:'7 → 10 km',c:'Semi-marathon en vue'},
+  {s:'Oct-Nov 2025',d:'10 → 15 km',c:'Semi-marathon couru'},
+  {s:'Déc 2025',d:'15 → 18 km',c:'Consolidation'},
+  {s:'Jan 2026',d:'18 → 21 km',c:'Plein semi · Marathon en vue'},
+  {s:'2026+',d:'21+ km',c:'Marathon · Sans limite'},
+];
+
+// Shopping avec semaines
+const SHOPPING_BASE={
+  'Protéines 🥩':[
+    {n:'Blancs de poulet halal (1kg)',q:'x2',semaines:[1,2,3,4]},
+    {n:'Bœuf haché halal (500g)',q:'x1',semaines:[1,2,3,4]},
+    {n:'Thon en boîte au naturel',q:'x4',semaines:[1,2,3,4]},
+    {n:'Œufs calibre M',q:'x12',semaines:[1,2,3,4]},
+    {n:'Fromage blanc 0%',q:'x2 pots',semaines:[1,2,3,4]},
+    {n:'Cabillaud / poisson blanc',q:'x2 filets',semaines:[2,4]},
+    {n:'Dinde émincée (300g)',q:'x1',semaines:[1,3]},
+    {n:'Côtelette agneau halal',q:'x2',semaines:[1,3]},
+  ],
+  'Féculents 🌾':[
+    {n:'Riz basmati',q:'1 kg',semaines:[1,2,3,4]},
+    {n:'Quinoa',q:'500g',semaines:[1,3]},
+    {n:'Flocons d\'avoine',q:'1 kg',semaines:[1,2,3,4]},
+    {n:'Pain complet',q:'1 miche',semaines:[1,2,3,4]},
+    {n:'Patates douces',q:'x4-5',semaines:[1,2,3,4]},
+    {n:'Pâtes complètes',q:'500g',semaines:[2,4]},
+    {n:'Boulgour ou semoule',q:'500g',semaines:[1,3]},
+  ],
+  'Légumes 🥬':[
+    {n:'Carottes',q:'1 kg',semaines:[1,2,3,4]},
+    {n:'Courgettes',q:'x4',semaines:[1,2,3,4]},
+    {n:'Haricots verts',q:'500g',semaines:[1,2,3,4]},
+    {n:'Épinards (frais ou surgelés)',q:'500g',semaines:[1,2,3,4]},
+    {n:'Tomates cerises',q:'x1 barquette',semaines:[1,2,3,4]},
+    {n:'Concombre',q:'x2',semaines:[1,2,3,4]},
+    {n:'Salade verte',q:'x1 sachet',semaines:[1,2,3,4]},
+  ],
+  'Fruits 🍌':[
+    {n:'Bananes',q:'1 régime',semaines:[1,2,3,4]},
+    {n:'Kiwis',q:'x6',semaines:[1,3]},
+    {n:'Pommes',q:'x4',semaines:[1,2,3,4]},
+    {n:'Oranges',q:'x4',semaines:[2,4]},
+    {n:'Fruits rouges surgelés',q:'x1 sachet',semaines:[1,2,3,4]},
+    {n:'Citrons',q:'1 filet',semaines:[1,2,3,4]},
+  ],
+  'Compléments 🫒':[
+    {n:'Huile d\'olive',q:'x1 bouteille',semaines:[1]},
+    {n:'Amandes',q:'200g',semaines:[1,2,3,4]},
+    {n:'Noix',q:'200g',semaines:[1,3]},
+    {n:'Graines de courge',q:'200g',semaines:[2,4]},
+    {n:'Miel',q:'x1 pot',semaines:[1]},
+    {n:'Lait végétal',q:'1L',semaines:[1,2,3,4]},
+  ],
+  'Shots & Infusions 🫖':[
+    {n:'Gingembre frais',q:'300g',semaines:[1,2,3,4]},
+    {n:'Citrons extra (shots)',q:'x1 filet',semaines:[1,2,3,4]},
+    {n:'Anis étoilé',q:'x1 sachet',semaines:[1]},
+    {n:'Graines de fenouil',q:'x1 sachet',semaines:[1]},
+    {n:'Menthe poivrée sachets',q:'x1 boîte',semaines:[1]},
+    {n:'Camomille sachets',q:'x1 boîte',semaines:[1]},
+    {n:'Curcuma en poudre',q:'x1 pot',semaines:[1]},
+    {n:'Cannelle',q:'x1 pot',semaines:[1]},
+  ],
+  'Épices 🟤':[
+    {n:'Cumin en poudre',q:'x1 pot',semaines:[1]},
+    {n:'Paprika doux',q:'x1 pot',semaines:[1]},
+    {n:'Coriandre',q:'x1 pot',semaines:[1]},
+  ],
+};
+
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+const TDK='tasks_'+new Date().toISOString().split('T')[0];
+let tasks=JSON.parse(localStorage.getItem(TDK)||JSON.stringify(new Array(TASKS.length).fill(false)));
+let logs=JSON.parse(localStorage.getItem('logs')||'[]');
+let muscuLogs=JSON.parse(localStorage.getItem('muscuLogs')||'{}');
+let courseChecked=JSON.parse(localStorage.getItem('courses')||'{}');
+let aProgDay=TI, aNutriDay=TI, aShots='planning', aCat=Object.keys(SHOPPING_BASE)[0];
+let aWeekFilter='all', aMuscuWeek=1, aMuscuSeance=0;
+
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function badge(t,c){return`<span class="badge" style="background:${c}22;color:${c};border:1px solid ${c}44">${t}</span>`;}
+
+// ══════════════════════════════
+// TABS
+// ══════════════════════════════
+function ST(id){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  const ids=['today','tracker','muscu','prog','nutrition','shots','courses','progress'];
+  document.querySelectorAll('.tb')[ids.indexOf(id)].classList.add('on');
+}
+
+// ══════════════════════════════
+// TODAY
+// ══════════════════════════════
+function renderToday(){
+  const p=PROG[TI],inf=INF[TI],m=MEALS[TI];
+  const done=tasks.filter(Boolean).length, pct=Math.round(done/TASKS.length*100);
+  const now=new Date();
+  document.getElementById('hdate').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('hprog').textContent=done+'/'+TASKS.length+' tâches ✓';
+  document.getElementById('tlabel').textContent=DAYS[TI]+' · '+now.toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
+  document.getElementById('tseance').textContent=p.icon+' '+p.label;
+  document.getElementById('tbadge').innerHTML=badge(p.type==='salle'?'Salle':p.type==='running'?'Running':'Repos actif',p.color);
+  document.getElementById('tpct').textContent=pct+'%';
+  document.getElementById('tpct').style.color=pct===100?'var(--green)':'var(--text)';
+  document.getElementById('tbar').style.width=pct+'%';
+  document.getElementById('today-hero').style.borderColor=p.color+'44';
+  document.getElementById('tasklist').innerHTML=TASKS.map((t,i)=>`
+    <button class="task ${tasks[i]?'done':''}" onclick="toggleTask(${i})">
+      <div class="chk"><span class="chk-i">✓</span></div>
+      <span style="font-size:15px">${t.icon}</span>
+      <span style="font-size:13px">${t.label}</span>
+    </button>`).join('');
+  document.getElementById('tmeals').innerHTML=[['🌅 Petit-déj',m.p],['☀️ Déjeuner',m.d],['🌙 Dîner',m.n],['🍎 Collation',m.c]]
+    .map(([l,v])=>`<div class="mitem"><div class="mlbl">${l}</div><div class="mval">${v}</div></div>`).join('');
+  document.getElementById('tinf-nom').textContent=inf.nom;
+  document.getElementById('tinf-mom').textContent=inf.moment;
+  document.getElementById('tinf-badge').innerHTML=badge(inf.fixed?'Fixe':'Optionnel',inf.fixed?'var(--green)':'var(--muted)');
+}
+function toggleTask(i){tasks[i]=!tasks[i];save(TDK,tasks);renderToday();}
+
+// ══════════════════════════════
+// TRACKER
+// ══════════════════════════════
+document.getElementById('t-date').value=new Date().toISOString().split('T')[0];
+function saveLog(){
+  const e={date:document.getElementById('t-date').value,poids:document.getElementById('t-poids').value,run:document.getElementById('t-run').value,notes:document.getElementById('t-notes').value};
+  logs.unshift(e); logs=logs.slice(0,90); save('logs',logs);
+  document.getElementById('t-poids').value=''; document.getElementById('t-run').value=''; document.getElementById('t-notes').value='';
+  renderTracker(); renderProgress();
+  const b=document.querySelector('.btn-save'); b.textContent='✓ Enregistré'; b.style.background='var(--gdim)';
+  setTimeout(()=>{b.textContent='Sauvegarder';b.style.background='var(--green)';},2000);
+}
+function renderTracker(){
+  const sg=document.getElementById('tstats'),hist=document.getElementById('thist');
+  if(!logs.length){sg.style.display='none';hist.style.display='none';return;}
+  sg.style.display='grid'; hist.style.display='block';
+  const lp=logs.find(l=>l.poids)?.poids, lr=logs.find(l=>l.run)?.run;
+  sg.innerHTML=[
+    {v:lp?lp+' kg':'—',l:'Poids actuel',c:'var(--blue)'},
+    {v:lr?lr+' km':'—',l:'Dernier run',c:'var(--orange)'},
+    {v:logs.length,l:'Sessions',c:'var(--green)'},
+  ].map(s=>`<div class="scard"><div class="sval" style="color:${s.c}">${s.v}</div><div class="slbl">${s.l}</div></div>`).join('');
+  document.getElementById('loglist').innerHTML=logs.map(l=>`
+    <div class="log-itm">
+      <div><div style="font-size:12px;color:var(--muted)">${l.date}</div>${l.notes?`<div style="font-size:12px;color:var(--text);margin-top:2px">${l.notes}</div>`:''}</div>
+      <div style="display:flex;gap:5px">${l.poids?badge(l.poids+' kg','var(--blue)'):''} ${l.run?badge(l.run+' km','var(--orange)'):''}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════
+// MUSCU TRACKER
+// ══════════════════════════════
+function renderMuscuWeeks(){
+  const ws=document.getElementById('muscu-weeks');
+  ws.innerHTML=Array.from({length:20},(_,i)=>i+1).map(w=>`
+    <button class="wbtn ${aMuscuWeek===w?'on':''}" onclick="selectMuscuWeek(${w})">S${w}</button>`).join('');
+}
+function selectMuscuWeek(w){aMuscuWeek=w;renderMuscuForm();renderMuscuWeeks();}
+function renderMuscuForm(){
+  const si=parseInt(document.getElementById('m-seance').value);
+  const exos=SALLE[si]||[];
+  const key=`${si}_${aMuscuWeek}`;
+  const existing=muscuLogs[key]||{};
+  document.getElementById('muscu-form').innerHTML=exos.map((e,i)=>`
+    <div class="muscu-log">
+      <div class="muscu-name">${e.ex}</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${e.s} séries · ${e.r} reps · ${e.rp} repos</div>
+      <div class="sets-row">
+        ${Array.from({length:parseInt(e.s)||3},(_,s)=>`
           <div>
-            <p style={{ margin: 0, color: C.textMuted, fontSize: 13, textTransform: "uppercase", letterSpacing: 1 }}>
-              {DAYS[TODAY_IDX]} · {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
-            </p>
-            <h1 style={{ margin: "6px 0 4px", fontSize: 26, fontWeight: 800, color: C.text }}>
-              {prog.icon} {prog.label}
-            </h1>
-            <Badge color={prog.color}>{prog.type === "salle" ? "Salle" : prog.type === "running" ? "Running" : "Repos actif"}</Badge>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 36, fontWeight: 800, color: pct === 100 ? C.green : C.text }}>{pct}%</div>
-            <div style={{ fontSize: 12, color: C.textMuted }}>Routine</div>
-          </div>
-        </div>
-        {/* Progress bar */}
-        <div style={{ marginTop: 16, background: C.border, borderRadius: 99, height: 6 }}>
-          <div style={{ width: `${pct}%`, height: 6, borderRadius: 99, background: `linear-gradient(90deg, ${C.greenDim}, ${C.green})`, transition: "width 0.4s ease" }} />
-        </div>
-      </Card>
-
-      {/* Routine du jour */}
-      <Card>
-        <SectionTitle icon="✅" title="Routine du jour" sub="Coche au fur et à mesure" />
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {ROUTINE_TASKS.map((t, i) => (
-            <button key={t.id} onClick={() => toggleTask(i)}
-              style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: 10,
-                background: tasks[i] ? C.greenGlow : C.surface, border: `1px solid ${tasks[i] ? C.green + "55" : C.border}`,
-                cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}>
-              <div style={{ width: 22, height: 22, borderRadius: 6, border: `2px solid ${tasks[i] ? C.green : C.border}`,
-                background: tasks[i] ? C.green : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {tasks[i] && <span style={{ color: "#000", fontSize: 13, fontWeight: 800 }}>✓</span>}
-              </div>
-              <span style={{ fontSize: 16 }}>{t.icon}</span>
-              <span style={{ color: tasks[i] ? C.green : C.text, fontSize: 14, fontWeight: tasks[i] ? 600 : 400, textDecoration: tasks[i] ? "line-through" : "none", opacity: tasks[i] ? 0.7 : 1 }}>
-                {t.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      {/* Repas du jour */}
-      <Card>
-        <SectionTitle icon="🍽️" title="Repas du jour" />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          {[["🌅 Petit-déj", meal.pdej], ["☀️ Déjeuner", meal.dej], ["🌙 Dîner", meal.din], ["🍎 Collation", meal.col]].map(([label, val]) => (
-            <div key={label} style={{ background: C.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${C.border}` }}>
-              <div style={{ color: C.textMuted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>{label}</div>
-              <div style={{ color: C.text, fontSize: 13, lineHeight: 1.4 }}>{val}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Infusion du jour */}
-      <Card style={{ borderColor: C.greenDim + "55" }}>
-        <SectionTitle icon="🫖" title="Infusion du soir" />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: C.green }}>{inf.nom}</div>
-            <div style={{ color: C.textMuted, fontSize: 13, marginTop: 2 }}>{inf.moment}</div>
-          </div>
-          <Badge color={inf.fixed ? C.green : C.textMuted}>{inf.fixed ? "Fixe" : "Optionnel"}</Badge>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-// ─── TRACKER TAB ───
-function TrackerTab({ logs, addLog }) {
-  const [form, setForm] = useState({ date: new Date().toISOString().split("T")[0], poids: "", running: "", notes: "" });
-  const [saved, setSaved] = useState(false);
-
-  const handleSave = async () => {
-    const newLogs = [form, ...logs].slice(0, 60);
-    await addLog(newLogs);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
-  const poidsData = logs.filter(l => l.poids).slice(0, 10).reverse();
-  const runData = logs.filter(l => l.running).slice(0, 10).reverse();
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Saisie */}
-      <Card>
-        <SectionTitle icon="📝" title="Saisie du jour" sub="Enregistre ta progression" />
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {[["Date", "date", "date"], ["Poids (kg)", "poids", "number"], ["Running (km)", "running", "number"]].map(([label, key, type]) => (
-              <div key={key}>
-                <label style={{ color: C.textMuted, fontSize: 12, fontWeight: 600, display: "block", marginBottom: 4 }}>{label}</label>
-                <input type={type} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })}
-                  style={{ width: "100%", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px",
-                    color: C.text, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
-              </div>
-            ))}
-          </div>
-          <div>
-            <label style={{ color: C.textMuted, fontSize: 12, fontWeight: 600, display: "block", marginBottom: 4 }}>Notes / Ressenti</label>
-            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2}
-              style={{ width: "100%", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px",
-                color: C.text, fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box" }} />
-          </div>
-          <button onClick={handleSave}
-            style={{ background: saved ? C.greenDim : C.green, color: "#000", fontWeight: 700, fontSize: 15, padding: "12px 0",
-              borderRadius: 10, border: "none", cursor: "pointer", transition: "all 0.2s" }}>
-            {saved ? "✓ Enregistré" : "Sauvegarder"}
-          </button>
-        </div>
-      </Card>
-
-      {/* Stats rapides */}
-      {logs.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-          {[
-            { label: "Poids actuel", val: logs.find(l => l.poids)?.poids ? `${logs.find(l => l.poids).poids} kg` : "—", color: C.blue },
-            { label: "Dernier run", val: logs.find(l => l.running)?.running ? `${logs.find(l => l.running).running} km` : "—", color: C.orange },
-            { label: "Sessions", val: logs.length, color: C.green },
-          ].map(({ label, val, color }) => (
-            <Card key={label} style={{ textAlign: "center", padding: "16px 12px" }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color }}>{val}</div>
-              <div style={{ color: C.textMuted, fontSize: 12, marginTop: 4 }}>{label}</div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Historique */}
-      {logs.length > 0 && (
-        <Card>
-          <SectionTitle icon="📋" title="Historique" sub={`${logs.length} entrée${logs.length > 1 ? "s" : ""}`} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 320, overflowY: "auto" }}>
-            {logs.map((l, i) => (
-              <div key={i} style={{ background: C.surface, borderRadius: 10, padding: "10px 14px", border: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ color: C.textMuted, fontSize: 12 }}>{l.date}</div>
-                  {l.notes && <div style={{ color: C.text, fontSize: 13, marginTop: 2 }}>{l.notes}</div>}
-                </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {l.poids && <Badge color={C.blue}>{l.poids} kg</Badge>}
-                  {l.running && <Badge color={C.orange}>{l.running} km</Badge>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {logs.length === 0 && (
-        <Card style={{ textAlign: "center", padding: 40 }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
-          <div style={{ color: C.textMuted, fontSize: 15 }}>Commence à saisir tes données pour voir ta progression apparaître ici.</div>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-// ─── PROGRAMME TAB ───
-function ProgrammeTab() {
-  const [activeDay, setActiveDay] = useState(TODAY_IDX);
-  const prog = PROGRAM[activeDay];
-  const exos = SALLE_PROGRAM[activeDay];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Sélecteur jours */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
-        {DAYS.map((d, i) => {
-          const p = PROGRAM[i];
-          const isActive = activeDay === i;
-          return (
-            <button key={i} onClick={() => setActiveDay(i)}
-              style={{ padding: "10px 4px", borderRadius: 10, border: `1px solid ${isActive ? p.color : C.border}`,
-                background: isActive ? `${p.color}22` : C.surface, cursor: "pointer", textAlign: "center" }}>
-              <div style={{ fontSize: 16 }}>{p.icon}</div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: isActive ? p.color : C.textMuted, marginTop: 2 }}>{d}</div>
-            </button>
-          );
-        })}
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px">S${s+1} (kg)</div>
+            <input class="set-input" type="number" step="2.5" placeholder="—" value="${(existing[i]||[])[s]||''}" 
+              onchange="updateMuscuSet(${i},${s},this.value)" id="ms_${i}_${s}">
+          </div>`).join('')}
       </div>
-
-      {/* Détail séance */}
-      <Card style={{ borderColor: prog.color + "44" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: C.text }}>{prog.icon} {prog.label}</h2>
-            <p style={{ margin: "4px 0 0", color: C.textMuted, fontSize: 13 }}>
-              {prog.type === "salle" ? "Basic Fit · 17h30 après le boulot" :
-               prog.type === "running" ? "Running · avant 19h30" : "Repos · marche 30 min"}
-            </p>
-          </div>
-          <Badge color={prog.color}>{prog.type}</Badge>
+    </div>`).join('');
+  renderMuscuHist(si);
+}
+function updateMuscuSet(exo,set,val){
+  const si=parseInt(document.getElementById('m-seance').value);
+  const key=`${si}_${aMuscuWeek}`;
+  if(!muscuLogs[key]) muscuLogs[key]={};
+  if(!muscuLogs[key][exo]) muscuLogs[key][exo]=[];
+  muscuLogs[key][exo][set]=parseFloat(val)||0;
+}
+function saveMuscuLog(){
+  save('muscuLogs',muscuLogs);
+  const b=document.querySelectorAll('.btn-save')[1];
+  b.textContent='✓ Séance sauvegardée'; b.style.background='var(--gdim)';
+  setTimeout(()=>{b.textContent='Sauvegarder la séance';b.style.background='var(--green)';},2000);
+  renderMuscuHist(parseInt(document.getElementById('m-seance').value));
+}
+function renderMuscuHist(si){
+  const hist=document.getElementById('muscu-hist');
+  const exos=SALLE[si]||[];
+  const hasData=Object.keys(muscuLogs).some(k=>k.startsWith(si+'_'));
+  if(!hasData){hist.style.display='none';return;}
+  hist.style.display='block';
+  document.getElementById('muscu-hist-list').innerHTML=exos.map((e,i)=>{
+    const weeks=Array.from({length:20},(_,w)=>{
+      const d=(muscuLogs[`${si}_${w+1}`]||{})[i];
+      return d?Math.max(...d.filter(Boolean)):null;
+    }).filter(v=>v!==null);
+    if(!weeks.length) return '';
+    const max=Math.max(...weeks), last=weeks[weeks.length-1];
+    return `<div style="background:var(--surface);border-radius:9px;padding:11px 13px;border:1px solid var(--border);margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${e.ex}</div>
+        <div style="display:flex;gap:8px">
+          ${badge(last+' kg','var(--green)')}
+          ${badge('Max: '+max+' kg','var(--blue)')}
         </div>
-
-        {exos ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {/* Header */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 60px 80px 60px", gap: 8, padding: "6px 12px" }}>
-              {["Exercice", "Séries", "Reps", "Repos"].map(h => (
-                <div key={h} style={{ color: C.textMuted, fontSize: 11, fontWeight: 600, textTransform: "uppercase" }}>{h}</div>
-              ))}
-            </div>
-            {exos.map((ex, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 60px 80px 60px", gap: 8,
-                padding: "12px", borderRadius: 10, background: i % 2 === 0 ? C.surface : "transparent", border: `1px solid ${i % 2 === 0 ? C.border : "transparent"}` }}>
-                <div style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>{ex.ex}</div>
-                <div style={{ color: prog.color, fontSize: 14, fontWeight: 700 }}>{ex.series}</div>
-                <div style={{ color: C.text, fontSize: 13 }}>{ex.reps}</div>
-                <div style={{ color: C.textMuted, fontSize: 13 }}>{ex.repos}</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ padding: "20px 0", textAlign: "center" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>{prog.icon}</div>
-            <div style={{ color: C.textMuted, fontSize: 14 }}>
-              {prog.type === "running" ? "Sors courir ! Distance selon ta semaine de progression." : "Marche 30 min · étirements · repos musculaire."}
-            </div>
-          </div>
-        )}
-      </Card>
-
-      {/* Mobilité matinale */}
-      <Card>
-        <SectionTitle icon="🌀" title="Mobilité matinale — Tous les jours" sub="Routine trevorsinstinct x2 · 8 minutes" />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          {["Hindu squats 30s","Body waves 30s","Side bends 30s","McGregors 30s","Chiropractors 30s","Aura farmers 30s","Arm circles 30s","Twists 30s"].map((ex, i) => (
-            <div key={i} style={{ background: C.surface, borderRadius: 8, padding: "8px 12px", border: `1px solid ${C.border}`, fontSize: 13, color: C.text }}>
-              {ex}
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 12, padding: "10px 14px", background: C.greenGlow, borderRadius: 10, border: `1px solid ${C.green}33` }}>
-          <span style={{ color: C.green, fontWeight: 600, fontSize: 13 }}>🫁 Vacuum ensuite</span>
-          <span style={{ color: C.textSub, fontSize: 13 }}> · 5 respirations · expire tout · rentre ventre 10-20s</span>
-        </div>
-      </Card>
-    </div>
-  );
+      </div>
+      <div style="display:flex;gap:4px;margin-top:8px;align-items:flex-end;height:30px">
+        ${weeks.map(v=>`<div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;opacity:.7;height:${Math.round((v/max)*28)+2}px;min-width:8px" title="${v} kg"></div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// ─── NUTRITION TAB ───
-function NutritionTab() {
-  const [activeDay, setActiveDay] = useState(TODAY_IDX);
-  const meal = MEALS_WEEK[activeDay];
+// ══════════════════════════════
+// PROGRAMME
+// ══════════════════════════════
+function renderProg(){
+  document.getElementById('prog-days').innerHTML=DAYS.map((d,i)=>{
+    const p=PROG[i], on=aProgDay===i;
+    return`<button class="dbtn ${on?'on':''}" onclick="selProgDay(${i})" style="${on?'border-color:'+p.color+';background:'+p.color+'18':''}">
+      <span style="font-size:15px">${p.icon}</span>
+      <span style="${on?'color:'+p.color:''}">${d}</span>
+    </button>`;}).join('');
+  const p=PROG[aProgDay], exos=SALLE[aProgDay];
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+    <div><h2 style="font-size:19px;font-weight:800">${p.icon} ${p.label}</h2>
+    <p style="color:var(--muted);font-size:12px;margin-top:3px">${p.type==='salle'?'Basic Fit · 17h30':p.type==='running'?'Running · avant 19h30':'Repos · marche 30 min'}</p></div>
+    ${badge(p.type,p.color)}</div>`;
+  if(exos){
+    h+=`<table class="exo-tbl"><thead><tr><th>Exercice</th><th>Séries</th><th>Reps</th><th>Repos</th><th></th></tr></thead><tbody>`;
+    h+=exos.map((e,i)=>`<tr>
+      <td><button class="exo-btn" onclick="openModal(${aProgDay},${i})">${e.ex} 🔍</button></td>
+      <td style="color:${p.color};font-weight:700">${e.s}</td>
+      <td>${e.r}</td>
+      <td style="color:var(--muted)">${e.rp}</td>
+      <td><button class="alt-btn" onclick="showAlt(${aProgDay},${i})">Machine absente ?</button></td>
+    </tr>`).join('');
+    h+='</tbody></table>';
+  } else {
+    h+=`<div style="text-align:center;padding:18px 0"><div style="font-size:30px;margin-bottom:7px">${p.icon}</div>
+    <div style="color:var(--muted);font-size:14px">${p.type==='running'?'Sors courir ! Distance selon ta semaine de progression.':'Marche 30 min · étirements · repos musculaire.'}</div></div>`;
+  }
+  document.getElementById('prog-detail').innerHTML=h;
+}
+function selProgDay(i){aProgDay=i;renderProg();}
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Sélecteur */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
-        {DAYS.map((d, i) => (
-          <button key={i} onClick={() => setActiveDay(i)}
-            style={{ padding: "8px 4px", borderRadius: 8, border: `1px solid ${activeDay === i ? C.green : C.border}`,
-              background: activeDay === i ? C.greenGlow : C.surface, cursor: "pointer" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: activeDay === i ? C.green : C.textMuted }}>{d}</div>
-          </button>
-        ))}
-      </div>
-
-      {/* Repas */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {[["🌅 Petit-déjeuner", meal.pdej, C.orange], ["☀️ Déjeuner", meal.dej, C.blue], ["🌙 Dîner", meal.din, C.purple], ["🍎 Collation", meal.col, C.green]].map(([label, val, color]) => (
-          <Card key={label} style={{ borderLeft: `3px solid ${color}` }}>
-            <div style={{ color, fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{label}</div>
-            <div style={{ color: C.text, fontSize: 15, lineHeight: 1.5 }}>{val}</div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Règles nutrition */}
-      <Card>
-        <SectionTitle icon="📋" title="Règles clés" />
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {[
-            ["💊", "Créatine 3g avec le dîner (jours de sport)"],
-            ["🐟", "Oméga 3 + Magnésium au petit-déjeuner"],
-            ["💧", "2,5L d'eau minimum · 3L les jours de sport"],
-            ["🏋️", "Dîner dans les 30-45 min après la séance"],
-            ["🛒", "Batch cooking Dimanche + Mercredi soir"],
-            ["⚠️", "Halal · Anti-fermentation · Fibres douces"],
-          ].map(([icon, text]) => (
-            <div key={text} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: `1px solid ${C.border}` }}>
-              <span style={{ fontSize: 16 }}>{icon}</span>
-              <span style={{ color: C.text, fontSize: 13 }}>{text}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
+// EXO MODAL
+function openModal(day,idx){
+  const e=SALLE[day][idx];
+  const svgKey=e.svg||'cable';
+  const svgHtml=SVG_EXOS[svgKey]||SVG_EXOS.cable;
+  document.getElementById('modal-content').innerHTML=`
+    <button class="modal-close" onclick="closeModal()">✕ Fermer</button>
+    <h2 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">${e.ex}</h2>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      ${badge(e.s+' séries','var(--green)')} ${badge(e.r+' reps','var(--blue)')} ${badge(e.rp+' repos','var(--muted)')}
     </div>
-  );
+    ${svgHtml}
+    <div style="margin-bottom:12px">
+      <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;margin-bottom:5px">💪 Muscles ciblés</div>
+      <div style="background:var(--surface);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--text)">${e.muscles}</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;margin-bottom:5px">📋 Technique</div>
+      <div style="background:var(--surface);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--text);line-height:1.5">${e.desc}</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;margin-bottom:5px">💡 Tips clés</div>
+      <div style="background:var(--gglow);border-radius:8px;padding:10px 13px;border:1px solid rgba(46,204,113,.2);font-size:13px;color:var(--green)">${e.tips}</div>
+    </div>`;
+  document.getElementById('exo-modal').classList.add('on');
+}
+function closeModal(){document.getElementById('exo-modal').classList.remove('on');}
+document.getElementById('exo-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+function showAlt(day,idx){
+  const e=SALLE[day][idx];
+  document.getElementById('modal-content').innerHTML=`
+    <button class="modal-close" onclick="closeModal()">✕ Fermer</button>
+    <h2 style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px">${e.ex}</h2>
+    <div style="color:var(--muted);font-size:13px;margin-bottom:14px">Machine ou équipement non disponible ? Voici les alternatives :</div>
+    ${e.alts.map((a,i)=>`<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:9px;padding:12px 14px;margin-bottom:8px">
+      <div style="font-size:14px;font-weight:600;color:var(--text)">Option ${i+1} — ${a}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">Même muscles · Mêmes séries/reps</div>
+    </div>`).join('')}
+    <div style="background:var(--bdim);border:1px solid rgba(52,152,219,.3);border-radius:9px;padding:12px 14px;margin-top:10px;font-size:13px;color:var(--blue)">
+      💡 Garde les mêmes paramètres (séries, reps, temps de repos) avec l'exercice alternatif.
+    </div>`;
+  document.getElementById('exo-modal').classList.add('on');
 }
 
-// ─── SHOTS TAB ───
-function ShotsTab() {
-  const [activeSection, setActiveSection] = useState("planning");
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-        {[["planning", "📅 Quand ?"], ["shots", "🔥 Recettes shots"], ["infusions", "🫖 Infusions"]].map(([id, label]) => (
-          <button key={id} onClick={() => setActiveSection(id)}
-            style={{ padding: "10px 6px", borderRadius: 10, border: `1px solid ${activeSection === id ? C.orange : C.border}`,
-              background: activeSection === id ? C.orangeDim : C.surface, cursor: "pointer",
-              color: activeSection === id ? C.orange : C.textMuted, fontWeight: 600, fontSize: 12 }}>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {activeSection === "planning" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {/* Explication claire */}
-          <Card style={{ borderColor: C.orange + "44", background: C.orangeDim }}>
-            <div style={{ fontWeight: 700, color: C.orange, fontSize: 15, marginBottom: 8 }}>⚠️ Tu ne prends pas tout chaque jour</div>
-            <div style={{ color: C.text, fontSize: 13, lineHeight: 1.6 }}>
-              Les shots sont un menu dans lequel tu pioches selon ton type de journée. Maximum 2 shots par jour, commence doucement semaine 1.
-            </div>
-          </Card>
-
-          {/* Jours de salle */}
-          <Card style={{ borderLeft: `3px solid ${C.green}` }}>
-            <div style={{ fontWeight: 700, color: C.green, fontSize: 14, marginBottom: 10 }}>🏋️ Jours de salle (Lun · Mer · Ven)</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { heure: "17h00", shot: "Golden Shot", desc: "Gingembre + curcuma + citron · 30 min avant la séance", optional: false },
-                { heure: "12h30", shot: "Shot Anti-KO", desc: "Gingembre + citron · si tu sens le coup de barre après déjeuner", optional: true },
-                { heure: "Après dîner", shot: "Shot Récup", desc: "Gingembre + curcuma + citron · dans les 30 min après la séance", optional: true },
-              ].map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, padding: "10px 12px", borderRadius: 8, background: C.surface, border: `1px solid ${C.border}` }}>
-                  <div style={{ width: 60, color: C.green, fontSize: 12, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>{s.heure}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                      <span style={{ color: C.text, fontWeight: 600, fontSize: 13 }}>{s.shot}</span>
-                      {s.optional && <Badge color={C.textMuted}>Optionnel</Badge>}
-                    </div>
-                    <div style={{ color: C.textMuted, fontSize: 12 }}>{s.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Jours de running */}
-          <Card style={{ borderLeft: `3px solid ${C.orange}` }}>
-            <div style={{ fontWeight: 700, color: C.orange, fontSize: 14, marginBottom: 10 }}>🏃 Jours de running (Mar · Sam · Collectif)</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { heure: "30 min avant", shot: "Shot Running", desc: "Gingembre + citron eau froide · énergie naturelle", optional: false },
-                { heure: "12h30", shot: "Shot Anti-KO", desc: "Gingembre + citron · si coup de barre midi (boulot)", optional: true },
-                { heure: "Après dîner", shot: "Shot Récup", desc: "Gingembre + curcuma + citron · récupération post-course", optional: true },
-              ].map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, padding: "10px 12px", borderRadius: 8, background: C.surface, border: `1px solid ${C.border}` }}>
-                  <div style={{ width: 70, color: C.orange, fontSize: 12, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>{s.heure}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                      <span style={{ color: C.text, fontWeight: 600, fontSize: 13 }}>{s.shot}</span>
-                      {s.optional && <Badge color={C.textMuted}>Optionnel</Badge>}
-                    </div>
-                    <div style={{ color: C.textMuted, fontSize: 12 }}>{s.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Jours de repos */}
-          <Card style={{ borderLeft: `3px solid ${C.purple}` }}>
-            <div style={{ fontWeight: 700, color: C.purple, fontSize: 14, marginBottom: 10 }}>🚶 Jeudi — Repos actif</div>
-            <div style={{ display: "flex", gap: 12, padding: "10px 12px", borderRadius: 8, background: C.surface, border: `1px solid ${C.border}` }}>
-              <div style={{ width: 60, color: C.purple, fontSize: 12, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>12h30</div>
-              <div>
-                <div style={{ color: C.text, fontWeight: 600, fontSize: 13, marginBottom: 3 }}>Shot Anti-KO uniquement</div>
-                <div style={{ color: C.textMuted, fontSize: 12 }}>Si coup de barre après déjeuner · optionnel</div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Progression conseillée */}
-          <Card style={{ borderColor: C.blue + "44" }}>
-            <div style={{ fontWeight: 700, color: C.blue, marginBottom: 10 }}>📈 Commence progressivement</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {[
-                ["Semaine 1", "Shot Anti-KO midi uniquement · teste la tolérance"],
-                ["Semaine 2", "Ajoute le shot pré-entraînement"],
-                ["Semaine 3", "Ajoute le shot récup si bien toléré"],
-              ].map(([sem, desc]) => (
-                <div key={sem} style={{ display: "flex", gap: 10 }}>
-                  <span style={{ color: C.blue, fontWeight: 600, fontSize: 13, minWidth: 80 }}>{sem}</span>
-                  <span style={{ color: C.textSub, fontSize: 13 }}>{desc}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      )}
-
-      {activeSection === "shots" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {SHOTS.map((s) => (
-            <Card key={s.nom} style={{ borderLeft: `3px solid ${s.color}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: C.text }}>{s.nom}</h3>
-                <Badge color={s.color}>{s.moment}</Badge>
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <div style={{ color: C.textMuted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", marginBottom: 4 }}>Ingrédients</div>
-                <div style={{ color: C.text, fontSize: 13, background: C.surface, padding: "8px 12px", borderRadius: 8 }}>{s.ingredients}</div>
-              </div>
-              <div style={{ color: s.color, fontSize: 13 }}>✓ {s.effet}</div>
-            </Card>
-          ))}
-          <Card style={{ background: C.orangeDim, borderColor: C.orange + "44" }}>
-            <div style={{ fontWeight: 700, color: C.orange, marginBottom: 6 }}>💡 Batch préparation</div>
-            <div style={{ color: C.text, fontSize: 13, lineHeight: 1.5 }}>
-              Râpe le gingembre frais (2-3 cm) · presse un demi-citron · 5cl d'eau · mélange dans un petit flacon hermétique.
-              Se conserve 3-4 jours au frigo. Prépare 4 doses à l'avance pour la semaine.
-            </div>
-          </Card>
-        </div>
-      )}
-
-      {activeSection === "infusions" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {[
-            { nom: "Anis étoilé", jours: "Lun · Mer · Ven · Dim", fixed: true, prep: "1-2 étoiles · eau frémissante · 8-10 min · bois chaud", effet: "Anti-ballonnement · calme SN · prépare sommeil", color: C.green },
-            { nom: "Fenouil", jours: "Mar · Sam (optionnel)", fixed: false, prep: "1 c.c. graines · légèrement écrasées · 10 min · filtre", effet: "Similaire anis · très efficace sur les gaz", color: C.blue },
-            { nom: "Menthe poivrée", jours: "Midi au boulot", fixed: false, prep: "Eau à 90° max · 5 min · chaud ou tiède", effet: "Anti-KO · digestive · stimulante sans caféine", color: C.orange },
-            { nom: "Camomille", jours: "Si ventre irrité", fixed: false, prep: "1 sachet · 8 min · miel optionnel", effet: "Apaisante · anti-spasme · aide endormissement", color: C.purple },
-          ].map((inf) => (
-            <Card key={inf.nom} style={{ borderLeft: `3px solid ${inf.color}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: C.text }}>{inf.nom}</h3>
-                <Badge color={inf.fixed ? inf.color : C.textMuted}>{inf.fixed ? "Fixe" : "Optionnel"}</Badge>
-              </div>
-              <div style={{ color: C.textMuted, fontSize: 12, marginBottom: 8 }}>📅 {inf.jours}</div>
-              <div style={{ background: C.surface, padding: "8px 12px", borderRadius: 8, fontSize: 13, color: C.text, marginBottom: 8 }}>{inf.prep}</div>
-              <div style={{ color: inf.color, fontSize: 13 }}>✓ {inf.effet}</div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+// ══════════════════════════════
+// NUTRITION
+// ══════════════════════════════
+function renderNutri(){
+  document.getElementById('nutri-days').innerHTML=DAYS.map((d,i)=>
+    `<button class="dbtn ${aNutriDay===i?'on':''}" onclick="selNutriDay(${i})">
+      <span style="font-size:11px;font-weight:600">${d}</span>
+    </button>`).join('');
+  const m=MEALS[aNutriDay];
+  document.getElementById('nutri-meals').innerHTML=[['🌅 Petit-déjeuner',m.p,'var(--orange)'],['☀️ Déjeuner',m.d,'var(--blue)'],['🌙 Dîner',m.n,'var(--purple)'],['🍎 Collation',m.c,'var(--green)']]
+    .map(([l,v,c])=>`<div class="card" style="border-left:3px solid ${c};margin-bottom:0">
+      <div style="color:${c};font-size:12px;font-weight:700;margin-bottom:5px">${l}</div>
+      <div style="font-size:14px;line-height:1.5">${v}</div>
+    </div>`).join('');
+  document.getElementById('nutri-rules').innerHTML=[
+    ['💊','Créatine 3g avec le dîner (jours de sport)'],
+    ['🐟','Oméga 3 + Magnésium au petit-déjeuner · tous les jours'],
+    ['💧','2,5L d\'eau min · 3L les jours de sport + électrolytes pendant l\'effort'],
+    ['🏋️','Dîner dans les 30-45 min après la séance'],
+    ['🛒','Batch cooking Dimanche matin + Mercredi soir'],
+    ['⚠️','Halal · Pas de Skyr · Pas de poivrons · Pas de whey'],
+  ].map(([ic,t])=>`<div style="display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:15px">${ic}</span><span style="font-size:13px">${t}</span></div>`).join('');
 }
+function selNutriDay(i){aNutriDay=i;renderNutri();}
 
-// ─── PROGRESS TAB ───
-function ProgressTab({ logs }) {
-  const start = new Date("2025-07-01");
-  const today = new Date();
-  const daysSinceStart = Math.max(0, Math.floor((today - start) / 86400000));
-  const weeksSinceStart = Math.floor(daysSinceStart / 7) + 1;
-
-  const currentWeekProg = RUNNING_WEEKS[Math.min(weeksSinceStart - 1, RUNNING_WEEKS.length - 1)];
-
-  const poidsLogs = logs.filter(l => l.poids).reverse();
-  const runLogs = logs.filter(l => l.running).reverse();
-  const startPoids = 76;
-  const latestPoids = poidsLogs.length > 0 ? parseFloat(poidsLogs[poidsLogs.length - 1].poids) : null;
-  const latestRun = runLogs.length > 0 ? parseFloat(runLogs[runLogs.length - 1].running) : 3;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Objectifs */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        {[
-          { label: "Fin juillet", date: "31 jul", run: "5 km", masse: "+1-2 kg", color: C.orange },
-          { label: "Fin août", date: "31 août", run: "7 km", masse: "+3-4 kg", color: C.green },
-        ].map(obj => (
-          <Card key={obj.label} style={{ borderTop: `2px solid ${obj.color}` }}>
-            <div style={{ color: obj.color, fontSize: 12, fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>{obj.label}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <div style={{ color: C.text, fontSize: 14 }}>🏃 {obj.run}</div>
-              <div style={{ color: C.text, fontSize: 14 }}>💪 {obj.masse}</div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Semaine en cours */}
-      <Card style={{ borderColor: C.green + "44" }}>
-        <SectionTitle icon="📍" title={`Semaine ${weeksSinceStart} — En cours`} />
-        <div style={{ background: C.greenGlow, borderRadius: 10, padding: "14px 16px", border: `1px solid ${C.green}33` }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{currentWeekProg?.dist || "3 → 3,5 km"}</div>
-          <div style={{ color: C.textSub, fontSize: 13, marginTop: 4 }}>{currentWeekProg?.cap || "Poser la routine"}</div>
-        </div>
-      </Card>
-
-      {/* Progression running */}
-      <Card>
-        <SectionTitle icon="🏃" title="Progression Running" sub="Départ : 3 km · Semi-marathon visé automne" />
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {RUNNING_WEEKS.map((w, i) => {
-            const isCurrent = i === Math.min(weeksSinceStart - 1, RUNNING_WEEKS.length - 1);
-            const isPast = i < weeksSinceStart - 1;
-            return (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10,
-                background: isCurrent ? C.greenGlow : isPast ? "transparent" : "transparent",
-                border: `1px solid ${isCurrent ? C.green + "55" : C.border}`, opacity: isPast ? 0.5 : 1 }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: isCurrent ? C.green : isPast ? C.greenDim : C.border, flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, color: C.textMuted }}>{w.sem}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{w.dist}</div>
-                </div>
-                <div style={{ fontSize: 12, color: isCurrent ? C.green : C.textMuted }}>{w.cap}</div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Stats poids */}
-      <Card>
-        <SectionTitle icon="⚖️" title="Évolution poids" sub="Départ : 76 kg · Objectif : +4-5 kg lean" />
-        {latestPoids ? (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            <div style={{ background: C.surface, borderRadius: 10, padding: "12px", textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{startPoids} kg</div>
-              <div style={{ color: C.textMuted, fontSize: 11 }}>Départ</div>
-            </div>
-            <div style={{ background: C.surface, borderRadius: 10, padding: "12px", textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{latestPoids} kg</div>
-              <div style={{ color: C.textMuted, fontSize: 11 }}>Actuel</div>
-            </div>
-            <div style={{ background: C.surface, borderRadius: 10, padding: "12px", textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: latestPoids > startPoids ? C.green : C.orange }}>
-                {latestPoids > startPoids ? "+" : ""}{(latestPoids - startPoids).toFixed(1)} kg
-              </div>
-              <div style={{ color: C.textMuted, fontSize: 11 }}>Variation</div>
-            </div>
-          </div>
-        ) : (
-          <div style={{ textAlign: "center", padding: "20px 0", color: C.textMuted, fontSize: 14 }}>
-            Commence à saisir ton poids dans le Tracker pour voir ta progression.
-          </div>
-        )}
-      </Card>
-
-      {/* Running stats */}
-      {runLogs.length > 0 && (
-        <Card>
-          <SectionTitle icon="🏃" title="Meilleur run enregistré" />
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <div style={{ background: C.orangeDim, borderRadius: 10, padding: "14px", textAlign: "center" }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: C.orange }}>{Math.max(...runLogs.map(l => parseFloat(l.running)))} km</div>
-              <div style={{ color: C.textMuted, fontSize: 12 }}>Record personnel</div>
-            </div>
-            <div style={{ background: C.surface, borderRadius: 10, padding: "14px", textAlign: "center" }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: C.text }}>{runLogs.length}</div>
-              <div style={{ color: C.textMuted, fontSize: 12 }}>Sessions running</div>
-            </div>
-          </div>
-        </Card>
-      )}
-    </div>
-  );
+// ══════════════════════════════
+// SHOTS
+// ══════════════════════════════
+function switchShots(s){
+  aShots=s;
+  ['planning','recettes','infusions'].forEach(id=>{
+    document.getElementById('shots-'+id).style.display=id===s?'flex':'none';
+    document.getElementById('sb-'+id).classList.toggle('on',id===s);
+  });
+  document.getElementById('shots-'+s).style.flexDirection='column';
 }
+function renderShots(){
+  document.getElementById('shots-planning').innerHTML=`
+    <div class="alert-o"><div style="font-weight:700;color:var(--orange);font-size:14px;margin-bottom:5px">⚠️ Tu ne prends pas tout chaque jour</div>
+    <div style="color:var(--text);font-size:13px;line-height:1.5">C'est un menu selon ta journée. Max 2 shots/jour. Commence par l'Anti-KO midi seulement la semaine 1.</div></div>
+    <div class="card" style="border-left:3px solid var(--green);margin-bottom:10px">
+      <div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:9px">🏋️ Jours de salle (Lun · Mer · Ven)</div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--green)">17h00</div><div><div class="sched-n">Golden Shot ${badge('FIXE','var(--green)')}</div><div class="sched-d">Gingembre + curcuma + citron · 30 min avant la séance</div></div></div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--muted)">12h30</div><div><div class="sched-n">Shot Anti-KO ${badge('Optionnel','var(--muted)')}</div><div class="sched-d">Si coup de barre après déjeuner au boulot</div></div></div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--muted)">Après dîner</div><div><div class="sched-n">Shot Récup ${badge('Optionnel','var(--muted)')}</div><div class="sched-d">Récupération musculaire · si souhaité</div></div></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--orange);margin-bottom:10px">
+      <div style="font-weight:700;color:var(--orange);font-size:13px;margin-bottom:9px">🏃 Jours de running (Mar · Sam · Collectif)</div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--orange)">30 min avant</div><div><div class="sched-n">Shot Running ${badge('FIXE','var(--orange)')}</div><div class="sched-d">Gingembre + citron eau froide · énergie naturelle</div></div></div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--muted)">12h30</div><div><div class="sched-n">Shot Anti-KO ${badge('Optionnel','var(--muted)')}</div><div class="sched-d">Si coup de barre midi au boulot</div></div></div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--muted)">Après dîner</div><div><div class="sched-n">Shot Récup ${badge('Optionnel','var(--muted)')}</div><div class="sched-d">Récupération post-course</div></div></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--purple);margin-bottom:10px">
+      <div style="font-weight:700;color:var(--purple);font-size:13px;margin-bottom:9px">🚶 Jeudi — Repos actif</div>
+      <div class="sched-row"><div class="sched-t" style="color:var(--muted)">12h30</div><div><div class="sched-n">Shot Anti-KO uniquement ${badge('Optionnel','var(--muted)')}</div><div class="sched-d">Si besoin seulement · pas d'entraînement</div></div></div>
+    </div>
+    <div class="alert-b"><div style="font-weight:700;color:var(--blue);margin-bottom:7px">📈 Progression semaine par semaine</div>
+    <div style="font-size:13px;color:var(--text);line-height:1.7"><b>S1</b> → Anti-KO midi uniquement<br><b>S2</b> → Ajoute le shot pré-entraînement<br><b>S3</b> → Ajoute le récup si bien toléré</div></div>`;
 
-// ─── COURSES TAB ───
-function CoursesTab() {
-  const [checked, setChecked] = useState({});
-  const [activeSection, setActiveSection] = useState("proteines");
-
-  const sections = [
-    { id: "proteines", label: "Protéines", icon: "🥩" },
-    { id: "feculents", label: "Féculents", icon: "🌾" },
-    { id: "legumes", label: "Légumes", icon: "🥬" },
-    { id: "fruits", label: "Fruits", icon: "🍌" },
-    { id: "complements", label: "Compléments", icon: "🫒" },
-    { id: "infusions", label: "Shots & Infusions", icon: "🫖" },
-    { id: "epices", label: "Épices", icon: "🟤" },
+  const shots=[
+    {nom:'Golden Shot',mom:'Pré-salle (30 min avant)',ing:'Gingembre 3cm + curcuma 1/2 c.c. + jus 1/2 citron + 5cl eau tiède',eff:'Anti-inflammatoire · boost circulation · focus',c:'var(--green)'},
+    {nom:'Shot Running',mom:'Pré-course (30 min avant)',ing:'Gingembre 2cm + jus 1/2 citron + 5cl eau froide',eff:'Tonique · énergie naturelle · prépare le cardio',c:'var(--orange)'},
+    {nom:'Shot Récup',mom:'Post-séance (30 min après)',ing:'Gingembre 2cm + curcuma + citron + 5cl eau tiède',eff:'Récupération musculaire · anti-inflammation',c:'var(--blue)'},
+    {nom:'Shot Anti-KO',mom:'Midi après déjeuner',ing:'Gingembre 2cm + jus 1/2 citron + 5cl eau froide',eff:'Relance digestive · coupe somnolence · sans caféine',c:'var(--purple)'},
+    {nom:'Shot Doux',mom:'Si ventre très sensible',ing:'Eau tiède + miel + jus citron + 1/4 c.c. cannelle',eff:'Énergie douce · anti-ballonnement · pas agressif',c:'var(--muted)'},
   ];
+  document.getElementById('shots-recettes').innerHTML=shots.map(s=>`
+    <div class="shot-card" style="border-left-color:${s.c};background:var(--card)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:9px"><div style="font-size:14px;font-weight:700">${s.nom}</div>${badge(s.mom,s.c)}</div>
+      <div style="color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;margin-bottom:4px">Ingrédients (sans poivre)</div>
+      <div style="background:var(--surface);padding:8px 11px;border-radius:7px;font-size:13px;margin-bottom:7px">${s.ing}</div>
+      <div style="font-size:12px;color:${s.c}">✓ ${s.eff}</div>
+    </div>`).join('')+`<div style="background:var(--odim);border:1px solid rgba(243,156,18,.3);border-radius:10px;padding:13px;margin-top:4px">
+    <div style="font-weight:700;color:var(--orange);margin-bottom:5px">💡 Batch 3-4 jours</div>
+    <div style="font-size:13px;color:var(--text)">Prépare 4 doses à l'avance dans un flacon hermétique · frigo · se conserve 3-4 jours. Pas de poivre — protège ton ventre.</div></div>`;
 
-  const toggleItem = (key) => setChecked(prev => ({ ...prev, [key]: !prev[key] }));
-  const totalItems = Object.values(SHOPPING_LIST).flat().length;
-  const checkedCount = Object.values(checked).filter(Boolean).length;
-
-  const currentList = SHOPPING_LIST[activeSection] || [];
-  const sectionChecked = currentList.filter((_, i) => checked[`${activeSection}_${i}`]).length;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* Header progress */}
-      <Card style={{ borderColor: C.green + "44" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.text }}>🛒 Liste de courses</div>
-            <div style={{ color: C.textMuted, fontSize: 13, marginTop: 2 }}>Pour la semaine · Halal · Anti-fermentation</div>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 26, fontWeight: 800, color: checkedCount === totalItems ? C.green : C.text }}>{checkedCount}/{totalItems}</div>
-            <div style={{ fontSize: 11, color: C.textMuted }}>cochés</div>
-          </div>
-        </div>
-        <div style={{ background: C.border, borderRadius: 99, height: 6 }}>
-          <div style={{ width: `${(checkedCount/totalItems)*100}%`, height: 6, borderRadius: 99, background: `linear-gradient(90deg, ${C.greenDim}, ${C.green})`, transition: "width 0.3s" }} />
-        </div>
-      </Card>
-
-      {/* Section tabs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
-        {sections.map(s => {
-          const list = SHOPPING_LIST[s.id] || [];
-          const done = list.filter((_, i) => checked[`${s.id}_${i}`]).length;
-          const isActive = activeSection === s.id;
-          return (
-            <button key={s.id} onClick={() => setActiveSection(s.id)}
-              style={{ padding: "8px 4px", borderRadius: 8, border: `1px solid ${isActive ? C.green : C.border}`,
-                background: isActive ? C.greenGlow : C.surface, cursor: "pointer", textAlign: "center" }}>
-              <div style={{ fontSize: 16 }}>{s.icon}</div>
-              <div style={{ fontSize: 10, color: isActive ? C.green : C.textMuted, fontWeight: 600, marginTop: 2 }}>{s.label}</div>
-              {done > 0 && <div style={{ fontSize: 10, color: C.green }}>{done}/{list.length}</div>}
-            </button>
-          );
-        })}
+  const infs=[
+    {nom:'Anis étoilé',j:'Lun · Mer · Ven · Dim (FIXE)',prep:'1-2 étoiles · eau frémissante (pas bouillante) · couvrir · 8-10 min',eff:'Anti-ballonnement · calme le système nerveux · prépare le sommeil',c:'var(--green)',fixed:true},
+    {nom:'Fenouil',j:'Mar · Sam (si ballonnements)',prep:'1 c.c. graines légèrement écrasées · 10 min · filtrer',eff:'Similaire à l\'anis · très efficace sur les gaz · doux',c:'var(--blue)',fixed:false},
+    {nom:'Menthe poivrée',j:'Midi au boulot tous les jours',prep:'Eau à 90° max (pas bouillante) · 5 min · chaud ou tiède',eff:'Anti-KO · digestive · stimulante sans caféine',c:'var(--orange)',fixed:false},
+    {nom:'Camomille',j:'Si ventre très irrité',prep:'1 sachet · eau frémissante · 8 min · miel optionnel',eff:'Apaisante · anti-spasme intestinal · aide endormissement',c:'var(--purple)',fixed:false},
+  ];
+  document.getElementById('shots-infusions').innerHTML=infs.map(inf=>`
+    <div class="shot-card" style="border-left-color:${inf.c};background:var(--card);margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+        <div style="font-size:14px;font-weight:700">${inf.nom}</div>
+        ${badge(inf.fixed?'Fixe':'Optionnel',inf.fixed?inf.c:'var(--muted)')}
       </div>
-
-      {/* Liste */}
-      <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <div style={{ fontWeight: 700, fontSize: 16, color: C.text }}>
-            {sections.find(s => s.id === activeSection)?.icon} {sections.find(s => s.id === activeSection)?.label}
-          </div>
-          <div style={{ color: C.textMuted, fontSize: 12 }}>{sectionChecked}/{currentList.length} cochés</div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {currentList.map((item, i) => {
-            const key = `${activeSection}_${i}`;
-            const isDone = checked[key];
-            return (
-              <button key={i} onClick={() => toggleItem(key)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10,
-                  background: isDone ? C.greenGlow : C.surface, border: `1px solid ${isDone ? C.green + "44" : C.border}`,
-                  cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}>
-                <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${isDone ? C.green : C.border}`,
-                  background: isDone ? C.green : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  {isDone && <span style={{ color: "#000", fontSize: 12, fontWeight: 800 }}>✓</span>}
-                </div>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>{item.cat}</span>
-                <span style={{ flex: 1, color: isDone ? C.textMuted : C.text, fontSize: 14,
-                  textDecoration: isDone ? "line-through" : "none", opacity: isDone ? 0.6 : 1 }}>
-                  {item.item}
-                </span>
-                <span style={{ color: C.textMuted, fontSize: 12, flexShrink: 0 }}>{item.qty}</span>
-              </button>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Tips batch cooking */}
-      <Card style={{ borderColor: C.orange + "44" }}>
-        <div style={{ fontWeight: 700, color: C.orange, marginBottom: 8 }}>💡 Batch cooking — Dimanche + Mercredi</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {["Riz basmati : prépare 400g · se conserve 4 jours au frigo",
-            "Poulet : grille 4-5 blancs · épices · 3-4 jours au frigo",
-            "Légumes vapeur : carottes + courgettes + haricots · 3 jours",
-            "Patate douce rôtie : 3-4 pièces au four 200°C · 4 jours",
-          ].map((tip, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, color: C.text, fontSize: 13 }}>
-              <span style={{ color: C.orange, flexShrink: 0 }}>→</span>
-              <span>{tip}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
+      <div style="color:var(--muted);font-size:11px;margin-bottom:7px">📅 ${inf.j}</div>
+      <div style="background:var(--surface);padding:8px 11px;border-radius:7px;font-size:13px;margin-bottom:7px">${inf.prep}</div>
+      <div style="font-size:12px;color:${inf.c}">✓ ${inf.eff}</div>
+    </div>`).join('');
 }
 
-// ─── MAIN APP ───
-export default function App() {
-  const [activeTab, setActiveTab] = useState("today");
-  const [tasks, setTasks] = useState(Array(ROUTINE_TASKS.length).fill(false));
-  const [logs, setLogs] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+// ══════════════════════════════
+// COURSES
+// ══════════════════════════════
+function renderCourses(){
+  const cats=Object.keys(SHOPPING_BASE);
+  // Week filter buttons
+  document.getElementById('week-filter').innerHTML=
+    `<button class="wfbtn ${aWeekFilter==='all'?'on':''}" onclick="selWeekFilter('all')">📋 Toutes</button>`+
+    [1,2,3,4].map(w=>`<button class="wfbtn ${aWeekFilter===w?'on':''}" onclick="selWeekFilter(${w})">Semaine ${w}</button>`).join('');
 
-  const todayKey = `tasks_${new Date().toISOString().split("T")[0]}`;
+  // Filter items
+  const filteredShopping={};
+  cats.forEach(cat=>{
+    const items=SHOPPING_BASE[cat].filter(item=>aWeekFilter==='all'||item.semaines.includes(aWeekFilter));
+    if(items.length) filteredShopping[cat]=items;
+  });
 
-  useEffect(() => {
-    (async () => {
-      const savedTasks = await getStorage(todayKey);
-      if (savedTasks) setTasks(savedTasks);
-      const savedLogs = await getStorage("logs");
-      if (savedLogs) setLogs(savedLogs);
-      setLoaded(true);
-    })();
-  }, []);
+  const totalItems=Object.values(filteredShopping).flat().length;
+  const checkedCount=Object.values(courseChecked).filter(Boolean).length;
+  document.getElementById('c-count').textContent=checkedCount+'/'+totalItems;
+  document.getElementById('c-bar').style.width=(totalItems>0?checkedCount/totalItems*100:0)+'%';
 
-  const toggleTask = async (i) => {
-    const next = tasks.map((v, idx) => idx === i ? !v : v);
-    setTasks(next);
-    await setStorage(todayKey, next);
-  };
+  // Category tabs
+  const filtCats=Object.keys(filteredShopping);
+  if(!filtCats.includes(aCat)) aCat=filtCats[0]||cats[0];
+  document.getElementById('c-cats').innerHTML=filtCats.map(cat=>{
+    const list=filteredShopping[cat]||[];
+    const done=list.filter((_,i)=>courseChecked[cat+'_'+i]).length;
+    return`<button class="sectb ${aCat===cat?'on':''}" onclick="selCat('${cat}')">
+      <span style="font-size:15px">${cat.split(' ').pop()}</span>
+      <span>${cat.split(' ')[0]}</span>
+      ${done>0?`<span style="font-size:9px;color:var(--green)">${done}/${list.length}</span>`:''}
+    </button>`;}).join('');
 
-  const addLog = async (newLogs) => {
-    setLogs(newLogs);
-    await setStorage("logs", newLogs);
-  };
-
-  if (!loaded) return (
-    <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: C.green, fontSize: 18 }}>Chargement...</div>
-    </div>
-  );
-
-  return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'Inter', -apple-system, sans-serif", color: C.text }}>
-      {/* Header */}
-      <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "16px 20px", position: "sticky", top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div style={{ fontSize: 11, color: C.green, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5 }}>the_rebornlife</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.text, marginTop: 2 }}>Programme Été 2025</div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 12, color: C.textMuted }}>{new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}</div>
-            <div style={{ fontSize: 12, color: C.green, fontWeight: 600, marginTop: 2 }}>
-              {tasks.filter(Boolean).length}/{ROUTINE_TASKS.length} tâches ✓
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", padding: "0 12px" }}>
-          {TABS.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              style={{ padding: "12px 14px", border: "none", background: "transparent", cursor: "pointer", whiteSpace: "nowrap",
-                color: activeTab === tab.id ? C.green : C.textMuted, fontWeight: activeTab === tab.id ? 700 : 400,
-                fontSize: 13, borderBottom: `2px solid ${activeTab === tab.id ? C.green : "transparent"}`, transition: "all 0.2s" }}>
-              {tab.icon} {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px 16px 80px" }}>
-        {activeTab === "today" && <TodayTab tasks={tasks} toggleTask={toggleTask} />}
-        {activeTab === "tracker" && <TrackerTab logs={logs} addLog={addLog} />}
-        {activeTab === "programme" && <ProgrammeTab />}
-        {activeTab === "nutrition" && <NutritionTab />}
-        {activeTab === "shots" && <ShotsTab />}
-        {activeTab === "courses" && <CoursesTab />}
-        {activeTab === "progress" && <ProgressTab logs={logs} />}
-      </div>
-    </div>
-  );
+  const list=filteredShopping[aCat]||[];
+  document.getElementById('c-list').innerHTML=list.length?list.map((item,i)=>{
+    const key=aCat+'_'+i, isDone=courseChecked[key];
+    return`<button class="citm ${isDone?'done':''}" onclick="toggleCourse('${key}')">
+      <div class="chk" style="border-color:${isDone?'var(--green)':'var(--border)'};background:${isDone?'var(--green)':'transparent'}"><span class="chk-i" style="${isDone?'display:block':'display:none'}">✓</span></div>
+      <span class="cname">${item.n}</span>
+      <span class="cqty">${item.q}</span>
+    </button>`}).join('')+`<button onclick="resetCourses()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:12px;cursor:pointer;margin-top:9px;font-family:inherit">Réinitialiser</button>`
+    :'<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Aucun article pour cette sélection</div>';
 }
+function selWeekFilter(w){aWeekFilter=w;renderCourses();}
+function selCat(c){aCat=c;renderCourses();}
+function toggleCourse(key){courseChecked[key]=!courseChecked[key];save('courses',courseChecked);renderCourses();}
+function resetCourses(){courseChecked={};save('courses',courseChecked);renderCourses();}
+
+// ══════════════════════════════
+// PROGRESS
+// ══════════════════════════════
+function renderProgress(){
+  const start=new Date('2025-07-01'), today=new Date();
+  const daysSince=Math.max(0,Math.floor((today-start)/86400000));
+  const wi=Math.min(Math.floor(daysSince/7),RUN_WEEKS.length-1);
+  document.getElementById('pw-title').textContent='Semaine '+(wi+1)+' — En cours';
+  document.getElementById('pw-detail').innerHTML=`
+    <div style="font-size:19px;font-weight:800;color:var(--green)">${RUN_WEEKS[wi].d}</div>
+    <div style="color:var(--sub);font-size:12px;margin-top:3px">${RUN_WEEKS[wi].c}</div>`;
+  document.getElementById('run-timeline').innerHTML=RUN_WEEKS.map((w,i)=>{
+    const cur=i===wi, past=i<wi;
+    return`<div class="run-itm" style="background:${cur?'var(--gglow)':'transparent'};border-color:${cur?'rgba(46,204,113,.35)':'var(--border)'};opacity:${past?.5:1}">
+      <div style="width:8px;height:8px;border-radius:50%;background:${cur?'var(--green)':past?'var(--gdim)':'var(--border)'};flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:11px;color:var(--muted)">${w.s}</div><div style="font-size:13px;font-weight:600">${w.d}</div></div>
+      <div style="font-size:11px;color:${cur?'var(--green)':'var(--muted)'}">${w.c}</div>
+    </div>`;}).join('');
+
+  const lp=logs.find(l=>l.poids)?.poids, lr=logs.find(l=>l.run)?.run;
+  document.getElementById('poids-stats').innerHTML=lp?`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:12px">
+      <div class="scard"><div class="sval" style="color:var(--blue)">76 kg</div><div class="slbl">Départ</div></div>
+      <div class="scard"><div class="sval" style="color:var(--green)">${lp} kg</div><div class="slbl">Actuel</div></div>
+      <div class="scard"><div class="sval" style="color:${parseFloat(lp)>76?'var(--green)':'var(--orange)'}">
+        ${parseFloat(lp)>76?'+':''}${(parseFloat(lp)-76).toFixed(1)} kg</div><div class="slbl">Variation</div></div>
+    </div>`:
+    `<div style="text-align:center;padding:16px 0;color:var(--muted);font-size:13px">Saisis ton poids dans le Tracker pour voir ta progression ici.</div>`;
+
+  // Running graph
+  const runLogs=logs.filter(l=>l.run).reverse();
+  const gc=document.getElementById('run-graph-card');
+  if(runLogs.length>=2){
+    gc.style.display='block';
+    const canvas=document.getElementById('run-canvas');
+    const ctx=canvas.getContext('2d');
+    canvas.width=canvas.offsetWidth||300; canvas.height=180;
+    const vals=runLogs.map(l=>parseFloat(l.run));
+    const maxV=Math.max(...vals,10), minV=Math.min(...vals);
+    const W=canvas.width, H=canvas.height, pad=20;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(46,204,113,0.3)'; ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){const y=pad+(H-2*pad)*i/4;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();}
+    const pts=vals.map((v,i)=>({x:pad+(W-2*pad)*i/(vals.length-1||1),y:H-pad-(H-2*pad)*(v-minV)/(maxV-minV||1)}));
+    // gradient fill
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(46,204,113,0.3)'); grad.addColorStop(1,'rgba(46,204,113,0)');
+    ctx.beginPath(); ctx.moveTo(pts[0].x,H-pad);
+    pts.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(pts[pts.length-1].x,H-pad); ctx.closePath();
+    ctx.fillStyle=grad; ctx.fill();
+    // line
+    ctx.beginPath(); ctx.strokeStyle='#2ECC71'; ctx.lineWidth=2.5;
+    pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.stroke();
+    // dots
+    pts.forEach((p,i)=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle='#2ECC71';ctx.fill();
+      ctx.fillStyle='var(--text)';ctx.font='10px sans-serif';ctx.fillText(vals[i]+'km',p.x-10,p.y-8);});
+  } else { gc.style.display='none'; }
+}
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+renderToday();
+renderProg();
+renderMuscuWeeks();
+renderMuscuForm();
+renderNutri();
+renderShots();
+renderCourses();
+renderTracker();
+renderProgress();
+switchShots('planning');
+</script>
+</body>
+</html>
