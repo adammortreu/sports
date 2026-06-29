@@ -328,7 +328,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div class="card card-al" style="margin-bottom:0;padding:13px 15px"><div class="label">🫖 Infusion</div><div id="d-inf" style="font-size:13px;font-weight:600;color:var(--g)"></div><div id="d-inf-m" style="font-size:11px;color:var(--tx3);margin-top:2px"></div></div>
   </div>
   <div class="card" style="padding:13px 15px">
-    <div class="fsb" style="margin-bottom:10px"><div class="label" style="margin-bottom:0">📅 7 derniers jours</div><span id="d-streak-count" style="font-size:11px;color:var(--tx3)"></span></div>
+    <div class="fsb" style="margin-bottom:10px"><div class="label" style="margin-bottom:0">📅 7 derniers jours</div><span id="d-streak-c" style="font-size:11px;color:var(--tx3)"></span></div>
     <div class="sdots" id="d-streak"></div>
   </div>
 </div>
@@ -398,16 +398,21 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </div>
 <!-- PROGRAMME -->
 <div id="tab-prog" class="pnl">
-  <div class="card" style="margin-bottom:14px">
-    <div class="fsb" style="margin-bottom:12px"><h3 class="title">📅 Planning semaine</h3><button class="btn btn-s btn-sm" onclick="toggleEdit()" id="edit-btn">✏️ Modifier</button></div>
+  <!-- Planning compact -->
+  <div class="card" style="margin-bottom:12px;padding:12px 14px">
+    <div class="fsb" style="margin-bottom:10px">
+      <h3 class="title">📅 Semaine type</h3>
+      <button class="btn btn-s btn-sm" onclick="toggleEdit()" id="edit-btn">✏️ Modifier</button>
+    </div>
     <div id="p-sched"></div>
     <div id="p-edit" style="display:none">
       <div class="sep"></div>
       <div class="label" style="margin-bottom:8px">Assigne une activité à chaque jour</div>
       <div id="p-edit-days"></div>
-      <button class="btn btn-g btn-full" onclick="saveSched()" style="margin-top:8px">Sauvegarder le planning</button>
+      <button class="btn btn-g btn-full" onclick="saveSched()" style="margin-top:8px">Sauvegarder</button>
     </div>
   </div>
+  <!-- Sélecteur jour + exercices -->
   <div class="dsel" id="p-days"></div>
   <div class="card" id="p-detail"></div>
   <div class="card">
@@ -427,9 +432,46 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </div>
 <!-- NUTRITION -->
 <div id="tab-nutrition" class="pnl">
+  <!-- Jour selector -->
   <div class="dsel" id="n-days"></div>
+  <!-- Repas du jour — 2 colonnes compactes -->
   <div id="n-meals"></div>
-  <div class="card"><h3 class="title" style="margin-bottom:12px">📋 Règles clés</h3><div id="n-rules"></div></div>
+  <!-- Macros résumé -->
+  <div class="card" style="padding:12px 14px;margin-bottom:12px">
+    <div style="display:flex;gap:10px;justify-content:space-around;text-align:center">
+      <div><div class="num" style="font-size:18px;color:#00E87A">~2700</div><div style="font-size:10px;color:var(--tx3)">kcal/jour</div></div>
+      <div style="width:1px;background:var(--bd)"></div>
+      <div><div class="num" style="font-size:18px;color:#4B9EFF">~160g</div><div style="font-size:10px;color:var(--tx3)">protéines</div></div>
+      <div style="width:1px;background:var(--bd)"></div>
+      <div><div class="num" style="font-size:18px;color:#FF8C42">~320g</div><div style="font-size:10px;color:var(--tx3)">glucides</div></div>
+      <div style="width:1px;background:var(--bd)"></div>
+      <div><div class="num" style="font-size:18px;color:#A855F7">~70g</div><div style="font-size:10px;color:var(--tx3)">lipides</div></div>
+    </div>
+  </div>
+  <!-- Règles clés — collapsible -->
+  <div class="card" style="padding:0">
+    <button onclick="toggleRules()" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:13px 16px;background:transparent;border:none;cursor:pointer;font-family:inherit;color:var(--tx)">
+      <h3 class="title">📋 Règles clés</h3>
+      <span id="rules-arrow" style="color:var(--tx3);font-size:14px;transition:transform .2s">▼</span>
+    </button>
+    <div id="n-rules" style="padding:0 16px 14px;display:none"></div>
+  </div>
+  <!-- Batch cooking -->
+  <div class="card" style="padding:0">
+    <button onclick="toggleBatch()" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:13px 16px;background:transparent;border:none;cursor:pointer;font-family:inherit;color:var(--tx)">
+      <h3 class="title">🥘 Batch cooking</h3>
+      <span id="batch-arrow" style="color:var(--tx3);font-size:14px;transition:transform .2s">▼</span>
+    </button>
+    <div id="n-batch" style="padding:0 16px 14px;display:none">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="background:var(--s1);border-radius:8px;padding:10px 13px;border:1px solid var(--bd);display:flex;justify-content:space-between"><span style="font-size:13px">🍚 Riz basmati</span><span style="font-size:12px;color:var(--tx3)">400g · 4 jours frigo</span></div>
+        <div style="background:var(--s1);border-radius:8px;padding:10px 13px;border:1px solid var(--bd);display:flex;justify-content:space-between"><span style="font-size:13px">🍗 Poulet grillé épicé</span><span style="font-size:12px;color:var(--tx3)">3-4 jours frigo</span></div>
+        <div style="background:var(--s1);border-radius:8px;padding:10px 13px;border:1px solid var(--bd);display:flex;justify-content:space-between"><span style="font-size:13px">🥦 Légumes vapeur</span><span style="font-size:12px;color:var(--tx3)">3 jours frigo</span></div>
+        <div style="background:var(--s1);border-radius:8px;padding:10px 13px;border:1px solid var(--bd);display:flex;justify-content:space-between"><span style="font-size:13px">🍠 Patate douce rôtie 200°C</span><span style="font-size:12px;color:var(--tx3)">4 jours frigo</span></div>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--tx3);text-align:center">Dimanche matin + Mercredi soir</div>
+    </div>
+  </div>
 </div>
 <!-- SHOTS -->
 <div id="tab-shots" class="pnl">
@@ -955,7 +997,7 @@ function closeM(){document.getElementById('exo-modal').classList.remove('on');}
 function renderN(){
   document.getElementById('n-days').innerHTML=DAYS.map(function(d,i){return'<button class="dbtn'+(aN===i?' on':'')+'" onclick="selND('+i+')"><span class="dl" style="font-size:11px;font-weight:600">'+d+'</span></button>';}).join('');
   var m=MEALS[aN];
-  document.getElementById('n-meals').innerHTML=[['🌅 Petit-déjeuner',m.p,'#FF8C42'],['☀️ Déjeuner',m.d,'#4B9EFF'],['🌙 Dîner',m.n,'#A855F7'],['🍎 Collation',m.c,'#00E87A']].map(function(x){return'<div class="card" style="border-left:3px solid '+x[2]+'"><div class="label" style="color:'+x[2]+'">'+x[0]+'</div><div style="font-size:14px;line-height:1.5">'+x[1]+'</div></div>';}).join('');
+  document.getElementById('n-meals').innerHTML='<div class="g2" style="margin-bottom:12px">'+[['🌅 Petit-déj',m.p,'#FF8C42'],['☀️ Déjeuner',m.d,'#4B9EFF'],['🌙 Dîner',m.n,'#A855F7'],['🍎 Collation',m.c,'#00E87A']].map(function(x){return'<div class="card" style="border-left:3px solid '+x[2]+';margin-bottom:0;padding:12px 14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:'+x[2]+';margin-bottom:5px">'+x[0]+'</div><div style="font-size:13px;line-height:1.5;color:#8B91A8">'+x[1]+'</div></div>';}).join('')+'</div>';
   document.getElementById('n-rules').innerHTML=[['💊','Créatine 3g avec le dîner · jours de sport uniquement'],['🐟','Oméga 3 (2 gélules) + Magnésium bisglycinate au petit-déjeuner'],['💧','2,5L eau min · 3L les jours de sport · Électrolytes pendant l\'effort'],['🏋️','Dîner dans les 30-45 min après la séance'],['🛒','Batch cooking Dimanche matin + Mercredi soir'],['⚠️','Halal · Pas de Skyr · Pas de poivrons · Pas de whey · Anti-fermentation']].map(function(x){return'<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #1C1F2A;align-items:flex-start"><span style="font-size:15px;flex-shrink:0">'+x[0]+'</span><span style="font-size:13px;line-height:1.5;color:#8B91A8">'+x[1]+'</span></div>';}).join('');
 }
 function selND(i){aN=i;renderN();}
@@ -972,29 +1014,51 @@ function switchS(s){
 }
 function renderSh(){
   document.getElementById('s-plan').innerHTML=
-    '<div class="al al-o"><strong style="color:#FF8C42">⚠️ Tu ne prends pas tout chaque jour</strong><br><span style="font-size:13px">C\'est un menu selon ta journée. Max 2 shots/jour. Semaine 1 : Anti-KO midi seulement.</span></div>'
-    +'<div class="card card-al" style="margin-bottom:10px"><div style="font-weight:700;color:#00E87A;margin-bottom:10px">🏋️ Jours de salle (Lun · Mer · Ven)</div>'
-    +'<div class="sr"><div class="st" style="color:#00E87A">17h00</div><div><div class="sn">Golden Shot '+bdg('FIXE','#00E87A')+'</div><div class="sd">Gingembre + curcuma + citron · 30 min avant la séance</div></div></div>'
-    +'<div class="sr"><div class="st" style="color:#5A6080">12h30</div><div><div class="sn">Shot Anti-KO '+bdg('Optionnel','#5A6080')+'</div><div class="sd">Si coup de barre après le déjeuner</div></div></div>'
-    +'<div class="sr"><div class="st" style="color:#5A6080">Après dîner</div><div><div class="sn">Shot Récup '+bdg('Optionnel','#5A6080')+'</div><div class="sd">Récupération musculaire · si souhaité</div></div></div></div>'
-    +'<div class="card card-ao" style="margin-bottom:10px"><div style="font-weight:700;color:#FF8C42;margin-bottom:10px">🏃 Jours de running (2x/semaine)</div>'
-    +'<div class="sr"><div class="st" style="color:#FF8C42">30 min avant</div><div><div class="sn">Shot Running '+bdg('FIXE','#FF8C42')+'</div><div class="sd">Gingembre + citron eau froide · énergie naturelle</div></div></div>'
-    +'<div class="sr"><div class="st" style="color:#5A6080">12h30</div><div><div class="sn">Shot Anti-KO '+bdg('Optionnel','#5A6080')+'</div><div class="sd">Si coup de barre midi au boulot</div></div></div></div>'
-    +'<div class="al al-b"><strong style="color:#4B9EFF">📈 Progression</strong><br><span style="font-size:12px">S1: Anti-KO midi · S2: + Pré-entraînement · S3: + Récup si toléré</span></div>';
+    '<div class="al al-o" style="margin-bottom:12px"><strong style="color:#FF8C42">⚠️ Max 2 shots/jour</strong> · Commence par Anti-KO midi seulement (S1)</div>'
+    // Tableau compact des shots par type de journée
+    +'<div class="card" style="margin-bottom:10px;padding:12px 14px">'
+    +'<div style="font-weight:700;color:#00E87A;font-size:12px;margin-bottom:8px">🏋️ SALLE (Lun · Mer · Ven)</div>'
+    +'<div style="display:flex;flex-direction:column;gap:5px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#111318;border-radius:7px"><span style="font-size:12px">17h00 · Golden Shot</span>'+bdg('FIXE','#00E87A')+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#111318;border-radius:7px"><span style="font-size:12px;color:#8B91A8">12h30 · Anti-KO</span>'+bdg('Optionnel','#5A6080')+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#111318;border-radius:7px"><span style="font-size:12px;color:#8B91A8">Après dîner · Récup</span>'+bdg('Optionnel','#5A6080')+'</div>'
+    +'</div></div>'
+    +'<div class="card" style="margin-bottom:10px;padding:12px 14px">'
+    +'<div style="font-weight:700;color:#FF8C42;font-size:12px;margin-bottom:8px">🏃 RUNNING (Mar · Sam)</div>'
+    +'<div style="display:flex;flex-direction:column;gap:5px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#111318;border-radius:7px"><span style="font-size:12px">30 min avant · Shot Running</span>'+bdg('FIXE','#FF8C42')+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#111318;border-radius:7px"><span style="font-size:12px;color:#8B91A8">12h30 · Anti-KO</span>'+bdg('Optionnel','#5A6080')+'</div>'
+    +'</div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">'
+    +'<div style="text-align:center;background:#111318;border-radius:8px;padding:9px;border:1px solid #242836"><div style="font-size:10px;color:#5A6080;font-weight:600;margin-bottom:2px">S1</div><div style="font-size:11px;color:#8B91A8">Anti-KO midi</div></div>'
+    +'<div style="text-align:center;background:#111318;border-radius:8px;padding:9px;border:1px solid #242836"><div style="font-size:10px;color:#5A6080;font-weight:600;margin-bottom:2px">S2</div><div style="font-size:11px;color:#8B91A8">+ Pré-séance</div></div>'
+    +'<div style="text-align:center;background:#111318;border-radius:8px;padding:9px;border:1px solid #242836"><div style="font-size:10px;color:#5A6080;font-weight:600;margin-bottom:2px">S3+</div><div style="font-size:11px;color:#8B91A8">+ Récup</div></div>'
+    +'</div>';
   document.getElementById('s-rec').innerHTML=[
-    {nom:'Golden Shot',mom:'Pré-salle · 30 min avant',ing:'Gingembre 3cm + curcuma ½ c.c. + jus ½ citron + 5cl eau tiède',eff:'Anti-inflammatoire · boost circulation · focus',c:'#00E87A'},
-    {nom:'Shot Running',mom:'Pré-course · 30 min avant',ing:'Gingembre 2cm + jus ½ citron + 5cl eau froide',eff:'Tonique · énergie naturelle · cardio',c:'#FF8C42'},
-    {nom:'Shot Récup',mom:'Post-séance · 30 min après',ing:'Gingembre 2cm + curcuma + citron + 5cl eau tiède',eff:'Récupération musculaire · anti-inflammation',c:'#4B9EFF'},
-    {nom:'Shot Anti-KO',mom:'Midi · après le déjeuner',ing:'Gingembre 2cm + jus ½ citron + 5cl eau froide',eff:'Coupe somnolence · relance digestive · sans caféine',c:'#A855F7'},
-    {nom:'Shot Doux',mom:'Si ventre très sensible',ing:'Eau tiède + miel + jus citron + ¼ c.c. cannelle',eff:'Doux · anti-ballonnement · pas d\'irritation',c:'#8B91A8'},
-  ].map(function(s){return'<div class="shc" style="border-left-color:'+s.c+'"><div class="fsb" style="margin-bottom:9px"><strong style="font-size:14px">'+s.nom+'</strong>'+bdg(s.mom,s.c)+'</div><div style="background:#111318;border-radius:8px;padding:9px 12px;font-size:12px;color:#8B91A8;margin-bottom:8px">'+s.ing+'</div><div style="font-size:12px;color:'+s.c+'">✓ '+s.eff+'</div></div>';}).join('')
-    +'<div class="al al-o"><strong style="color:#FF8C42">💡 Batch 3-4 jours</strong> · Prépare 4 doses · flacon frigo · sans poivre</div>';
+    {nom:'Golden Shot',mom:'Pré-salle',ing:'Gingembre 3cm · curcuma ½c.c. · ½ citron · 5cl eau tiède',c:'#00E87A'},
+    {nom:'Shot Running',mom:'Pré-course',ing:'Gingembre 2cm · ½ citron · 5cl eau froide',c:'#FF8C42'},
+    {nom:'Shot Récup',mom:'Post-séance',ing:'Gingembre 2cm · curcuma · citron · 5cl eau tiède',c:'#4B9EFF'},
+    {nom:'Shot Anti-KO',mom:'Midi au boulot',ing:'Gingembre 2cm · ½ citron · 5cl eau froide',c:'#A855F7'},
+    {nom:'Shot Doux',mom:'Ventre sensible',ing:'Eau tiède · miel · citron · ¼c.c. cannelle',c:'#8B91A8'},
+  ].map(function(s){
+    return'<div style="display:flex;gap:12px;align-items:center;padding:10px 13px;background:#111318;border:1px solid #242836;border-left:3px solid '+s.c+';border-radius:9px;margin-bottom:7px">'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:3px">'+s.nom+'</div>'
+      +'<div style="font-size:11px;color:#8B91A8">'+s.ing+'</div></div>'
+      +bdg(s.mom,s.c)+'</div>';
+  }).join('')
+  +'<div style="margin-top:10px;padding:9px 12px;background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.2);border-radius:8px;font-size:12px;color:#FF8C42">💡 Prépare 4 doses en avance · flacon frigo · 3-4 jours · sans poivre</div>';
   document.getElementById('s-inf').innerHTML=[
-    {nom:'Anis étoilé',j:'Lun · Mer · Ven · Dim — FIXE',prep:'1-2 étoiles · eau frémissante · couvrir · 8-10 min',eff:'Anti-ballonnement · calme · aide l\'endormissement',c:'#00E87A',f:true},
-    {nom:'Fenouil',j:'Mar · Sam — si ballonnements',prep:'1 c.c. graines écrasées · 10 min · filtrer',eff:'Similaire anis · efficace sur les gaz · doux',c:'#4B9EFF',f:false},
-    {nom:'Menthe poivrée',j:'Midi au boulot',prep:'Eau à 90° max · 5 min · tiède ou chaud',eff:'Anti-KO · digestive · stimulante sans caféine',c:'#FF8C42',f:false},
-    {nom:'Camomille',j:'Si ventre très irrité',prep:'1 sachet · eau frémissante · 8 min · miel optionnel',eff:'Apaisante · anti-spasme · aide l\'endormissement',c:'#A855F7',f:false},
-  ].map(function(inf){return'<div class="shc" style="border-left-color:'+inf.c+';margin-bottom:10px"><div class="fsb" style="margin-bottom:7px"><strong style="font-size:14px">'+inf.nom+'</strong>'+bdg(inf.f?'Fixe':'Optionnel',inf.f?inf.c:'#5A6080')+'</div><div style="font-size:11px;color:#5A6080;margin-bottom:7px">📅 '+inf.j+'</div><div style="background:#111318;border-radius:8px;padding:9px 12px;font-size:12px;color:#8B91A8;margin-bottom:8px">'+inf.prep+'</div><div style="font-size:12px;color:'+inf.c+'">✓ '+inf.eff+'</div></div>';}).join('');
+    {nom:'Anis étoilé',j:'Lun · Mer · Ven · Dim',prep:'1-2 étoiles · eau frémissante · 8-10 min',c:'#00E87A',f:true},
+    {nom:'Fenouil',j:'Mar · Sam (si ballonnements)',prep:'1c.c. graines · 10 min · filtrer',c:'#4B9EFF',f:false},
+    {nom:'Menthe poivrée',j:'Midi au boulot',prep:'Eau à 90° max · 5 min',c:'#FF8C42',f:false},
+    {nom:'Camomille',j:'Si ventre très irrité',prep:'1 sachet · 8 min · miel optionnel',c:'#A855F7',f:false},
+  ].map(function(inf){
+    return'<div style="display:flex;gap:12px;align-items:flex-start;padding:11px 13px;background:#111318;border:1px solid #242836;border-left:3px solid '+inf.c+';border-radius:9px;margin-bottom:7px">'
+      +'<div style="flex:1"><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><span style="font-size:13px;font-weight:600">'+inf.nom+'</span>'+bdg(inf.f?'Fixe':'Optionnel',inf.f?inf.c:'#5A6080')+'</div>'
+      +'<div style="font-size:11px;color:#5A6080;margin-bottom:3px">📅 '+inf.j+'</div>'
+      +'<div style="font-size:11px;color:#8B91A8">'+inf.prep+'</div></div>'
+      +'</div>';
+  }).join('');
 }
 
 // ── COURSES ──
@@ -1053,12 +1117,30 @@ function renderOD(year,mo){
   else{cv.style.display='none';nd.style.display='block';}
 }
 function saveUO(key){
-  uo[key]={run:document.getElementById('uo-r').value,poids:document.getElementById('uo-p').value,note:document.getElementById('uo-n').value};
-  sv('uo',uo);renderOC();
-  var b=document.getElementById('uo-btn');if(b){b.textContent='✅ Sauvegardé !';b.style.background='linear-gradient(135deg,#00B85E,#00D466)';setTimeout(function(){b.textContent='Sauvegarder mes objectifs';b.style.background='';},2500);}
+  var r=document.getElementById('uo-r'),p=document.getElementById('uo-p'),n=document.getElementById('uo-n');
+  if(!r||!p||!n){toast('Erreur : formulaire introuvable','err');return;}
+  uo[key]={run:r.value,poids:p.value,note:n.value};
+  sv('uo',uo);renderOC();renderOD(oY,oM);
+  var b=document.getElementById('uo-btn');
+  if(b){b.textContent='✅ Sauvegardé !';b.style.background='linear-gradient(135deg,#00B85E,#00D466)';setTimeout(function(){b.textContent='Sauvegarder mes objectifs';b.style.background='';},2500);}
   toast('Objectifs sauvegardés ✓','ok');
 }
 
+// ── COLLAPSIBLE HELPERS ──
+function toggleRules(){
+  var el=document.getElementById('n-rules');
+  var ar=document.getElementById('rules-arrow');
+  var open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  ar.style.transform=open?'':'rotate(180deg)';
+}
+function toggleBatch(){
+  var el=document.getElementById('n-batch');
+  var ar=document.getElementById('batch-arrow');
+  var open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  ar.style.transform=open?'':'rotate(180deg)';
+}
 // ── INIT ──
 renderAll();
 renderTR();
