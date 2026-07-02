@@ -292,6 +292,8 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <button class="tb" onclick="GO('shots')">🔥 Shots</button>
       <button class="tb" onclick="GO('courses')">🛒 Courses</button>
       <button class="tb" onclick="GO('objectifs')">🎯 Objectifs</button>
+      <button class="tb" onclick="GO('backup')">💾 Backup</button>
+      <button class="tb" onclick="GO('boditrax')">📊 Boditrax</button>
     </div>
   </div>
 </div>
@@ -303,7 +305,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div style="flex:1">
         <div id="d-date" style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;font-weight:600"></div>
         <div class="hero-seance" id="d-seance"></div>
-        <div id="d-badge"></div>
+        <div id="d-badge" style="margin-bottom:4px"></div><div id="d-boditrax" style="font-size:10px;color:#5A6080;margin-top:4px"></div>
       </div>
       <div style="text-align:center;margin-left:16px">
         <div class="hero-pct" id="d-pct">0%</div>
@@ -318,10 +320,25 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div class="kpi" style="--kpi-color:#FF8C42"><div class="kpi-val" id="k-run" style="color:var(--o)">—</div><div class="kpi-lbl">Meilleur run</div><div class="kpi-sub" id="k-run-s"></div></div>
     <div class="kpi" style="--kpi-color:#00E87A"><div class="kpi-val" id="k-sess" style="color:var(--g)">0</div><div class="kpi-lbl">Sessions</div><div class="kpi-sub">enregistrées</div></div>
   </div>
-  <div class="card" style="margin-bottom:12px">
-    <div class="fsb" style="margin-bottom:10px"><h3 class="title">✅ Routine du jour</h3><span id="d-tc2" class="badge" style="background:rgba(139,145,168,.1);color:var(--tx2);border:1px solid rgba(139,145,168,.15)"></span></div>
-    <div id="d-tasks"></div>
-    <button onclick="GO('tracker')" class="btn btn-g btn-full" style="margin-top:10px">📝 Saisir poids · running · ressenti →</button>
+  <div class="g2" style="margin-bottom:12px">
+    <!-- Routine du jour -->
+    <div class="card" style="margin-bottom:0">
+      <div class="fsb" style="margin-bottom:10px"><h3 class="title">✅ Routine</h3><span id="d-tc2" class="badge" style="background:rgba(139,145,168,.1);color:var(--tx2);border:1px solid rgba(139,145,168,.15)"></span></div>
+      <div id="d-tasks"></div>
+      <button onclick="GO('tracker')" class="btn btn-g btn-full" style="margin-top:10px;font-size:12px">📝 Saisir ma journée</button>
+    </div>
+    <!-- Abdos du jour -->
+    <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
+      <div class="fsb" style="margin-bottom:10px">
+        <h3 class="title">💪 Abdos</h3>
+        <span class="badge" style="background:rgba(255,77,106,.1);color:#FF4D6A;border:1px solid rgba(255,77,106,.2)">Daily · 10 min</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:5px" id="d-abdo-mini"></div>
+      <a href="https://www.youtube.com/results?search_query=routine+abdos+10+minutes+progressif+débutant" target="_blank" rel="noopener"
+        style="display:flex;align-items:center;justify-content:center;gap:6px;background:#FF0000;color:#fff;border-radius:8px;padding:9px;text-decoration:none;font-weight:700;font-size:12px;margin-top:10px">
+        ▶ Voir la routine YouTube
+      </a>
+    </div>
   </div>
   <div class="g2" style="margin-bottom:12px">
     <div class="card card-ao" style="margin-bottom:0;padding:13px 15px"><div class="label">🌙 Dîner</div><div id="d-diner" style="font-size:13px;line-height:1.5;color:var(--tx2)"></div></div>
@@ -415,6 +432,37 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <!-- Sélecteur jour + exercices -->
   <div class="dsel" id="p-days"></div>
   <div class="card" id="p-detail"></div>
+  <!-- ABDO ROUTINE -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="fsb" style="margin-bottom:12px">
+      <div>
+        <h3 class="title">💪 Routine abdos — Tous les jours · 10 min</h3>
+        <div style="font-size:11px;color:var(--tx3);margin-top:2px">Après la mobilité matinale ou après la séance</div>
+      </div>
+      <span class="badge" style="background:rgba(255,77,106,.1);color:#FF4D6A;border:1px solid rgba(255,77,106,.2)">Daily</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px" id="abdo-list"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <a href="https://www.youtube.com/results?search_query=routine+abdos+10+minutes+debutant+progressif" target="_blank" rel="noopener"
+        style="flex:2;display:flex;align-items:center;justify-content:center;gap:8px;background:#FF0000;color:#fff;border-radius:9px;padding:10px;text-decoration:none;font-weight:700;font-size:13px">
+        ▶ Voir la routine YouTube
+      </a>
+      <button onclick="startTimer(600, 'Routine abdos · 10 min')" class="btn btn-sm" style="flex:1;background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.2);color:#00E87A;font-size:12px">
+        ⏱ Timer 10 min
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+      <a href="https://www.youtube.com/results?search_query=gainage+planche+progressif+core" target="_blank" rel="noopener"
+        style="display:flex;align-items:center;justify-content:center;gap:5px;background:#111318;border:1px solid #242836;color:#4B9EFF;border-radius:8px;padding:8px;text-decoration:none;font-size:11px;font-weight:600">
+        ▶ Gainage progressif
+      </a>
+      <a href="https://www.youtube.com/results?search_query=crunch+abdos+technique+débutant" target="_blank" rel="noopener"
+        style="display:flex;align-items:center;justify-content:center;gap:5px;background:#111318;border:1px solid #242836;color:#4B9EFF;border-radius:8px;padding:8px;text-decoration:none;font-size:11px;font-weight:600">
+        ▶ Crunch technique
+      </a>
+    </div>
+  </div>
+
   <div class="card">
     <h3 class="title" style="margin-bottom:12px">🌀 Mobilité matinale · Tous les jours · 8 min</h3>
     <div class="g2" style="margin-bottom:10px">
@@ -438,14 +486,26 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <div id="n-meals"></div>
   <!-- Macros résumé -->
   <div class="card" style="padding:12px 14px;margin-bottom:12px">
-    <div style="display:flex;gap:10px;justify-content:space-around;text-align:center">
-      <div><div class="num" style="font-size:18px;color:#00E87A">~2700</div><div style="font-size:10px;color:var(--tx3)">kcal/jour</div></div>
-      <div style="width:1px;background:var(--bd)"></div>
-      <div><div class="num" style="font-size:18px;color:#4B9EFF">~160g</div><div style="font-size:10px;color:var(--tx3)">protéines</div></div>
-      <div style="width:1px;background:var(--bd)"></div>
-      <div><div class="num" style="font-size:18px;color:#FF8C42">~320g</div><div style="font-size:10px;color:var(--tx3)">glucides</div></div>
-      <div style="width:1px;background:var(--bd)"></div>
-      <div><div class="num" style="font-size:18px;color:#A855F7">~70g</div><div style="font-size:10px;color:var(--tx3)">lipides</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:#111318;border-radius:8px;padding:9px;text-align:center;border:1px solid #242836">
+        <div class="num" style="font-size:17px;color:#00E87A">2600</div>
+        <div style="font-size:10px;color:#5A6080">kcal · jours sport</div>
+      </div>
+      <div style="background:#111318;border-radius:8px;padding:9px;text-align:center;border:1px solid #242836">
+        <div class="num" style="font-size:17px;color:#FF8C42">2200</div>
+        <div style="font-size:10px;color:#5A6080">kcal · jours repos</div>
+      </div>
+      <div style="background:#111318;border-radius:8px;padding:9px;text-align:center;border:1px solid #242836">
+        <div class="num" style="font-size:17px;color:#4B9EFF">160g</div>
+        <div style="font-size:10px;color:#5A6080">protéines / jour</div>
+      </div>
+      <div style="background:#111318;border-radius:8px;padding:9px;text-align:center;border:1px solid #242836">
+        <div class="num" style="font-size:17px;color:#A855F7">BMR 1817</div>
+        <div style="font-size:10px;color:#5A6080">kcal métabolisme base</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;padding:8px 12px;background:rgba(0,232,122,.06);border-radius:8px;font-size:11px;color:#5A6080;text-align:center">
+      Objectif skinny fit · 75→79kg lean · 17,8%→14-15% graisse
     </div>
   </div>
   <!-- Règles clés — collapsible -->
@@ -528,6 +588,124 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
 </div>
 </div>
+<!-- BACKUP -->
+<div id="tab-backup" class="pnl">
+  <div class="card card-hero" style="margin-bottom:14px">
+    <h2 class="title" style="margin-bottom:4px">💾 Sauvegarde & Restauration</h2>
+    <p style="font-size:12px;color:var(--tx3)">Exporte et importe toutes tes données</p>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <h3 class="title" style="margin-bottom:6px">📤 Exporter mes données</h3>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Télécharge un fichier JSON avec tout ton historique · poids · charges · objectifs</p>
+    <button class="btn btn-g btn-full" onclick="exportData()" style="padding:12px">⬇️ Télécharger ma sauvegarde</button>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <h3 class="title" style="margin-bottom:6px">📥 Restaurer mes données</h3>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Importe un fichier de sauvegarde précédent</p>
+    <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--tx2)">
+      📂 Choisir un fichier backup
+      <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+    </label>
+  </div>
+  <div class="card">
+    <h3 class="title" style="margin-bottom:10px">📊 Résumé de mes données</h3>
+    <div id="backup-summary"></div>
+    <div style="margin-top:12px;padding:10px 13px;background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);border-radius:8px">
+      <div style="font-size:12px;color:#FF4D6A;font-weight:600;margin-bottom:3px">⚠️ Réinitialiser toutes les données</div>
+      <div style="font-size:11px;color:var(--tx3);margin-bottom:8px">Efface tout — fais un backup d'abord !</div>
+      <button onclick="resetAll()" class="btn btn-r btn-sm btn-full">Réinitialiser tout</button>
+    </div>
+  </div>
+</div>
+
+<!-- BODITRAX -->
+<div id="tab-boditrax" class="pnl">
+  <div class="card card-hero" style="margin-bottom:14px">
+    <h2 class="title" style="margin-bottom:3px">📊 Suivi Boditrax</h2>
+    <p style="font-size:12px;color:var(--tx3)">Compare tes mesures dans le temps · Balance à impédancemétrie</p>
+  </div>
+
+  <!-- Baseline J1 -->
+  <div class="card" style="margin-bottom:12px;border-color:rgba(0,232,122,.25)">
+    <div class="fsb" style="margin-bottom:12px">
+      <h3 class="title">📍 Baseline · 1er Juillet 2026</h3>
+      <span class="badge" style="background:rgba(0,232,122,.1);color:#00E87A;border:1px solid rgba(0,232,122,.2)">Point de départ</span>
+    </div>
+    <div class="g2" style="margin-bottom:8px">
+      <div class="kpi" style="--kpi-color:#4B9EFF"><div class="kpi-val" style="color:#4B9EFF">75,1 kg</div><div class="kpi-lbl">Poids</div></div>
+      <div class="kpi" style="--kpi-color:#FF8C42"><div class="kpi-val" style="color:#FF8C42">17,8%</div><div class="kpi-lbl">Masse grasse</div></div>
+      <div class="kpi" style="--kpi-color:#00E87A"><div class="kpi-val" style="color:#00E87A">78%</div><div class="kpi-lbl">Masse musculaire</div></div>
+      <div class="kpi" style="--kpi-color:#A855F7"><div class="kpi-val" style="color:#A855F7">819</div><div class="kpi-lbl">Score /1000</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">Masse musculaire totale</span><span style="color:#00E87A;font-weight:600">58,6 kg</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">Masse grasse totale</span><span style="color:#FF8C42;font-weight:600">13,4 kg</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">Masse osseuse</span><span style="color:#4B9EFF;font-weight:600">3,1 kg</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">Eau totale</span><span style="color:#4B9EFF;font-weight:600">43,1 kg (57,4%)</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">Graisse viscérale</span><span style="color:#00E87A;font-weight:600">3 / 49 ✅</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">IMC</span><span style="color:#00E87A;font-weight:600">22,4 ✅</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">BMR</span><span style="color:#8B91A8;font-weight:600">1817 kcal</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:#111318;border-radius:7px;font-size:12px"><span style="color:#8B91A8">Profil physique</span><span style="color:#00E87A;font-weight:600">Mince Musclé ✅</span></div>
+    </div>
+  </div>
+
+  <!-- Saisie nouvelle mesure -->
+  <div class="card" style="margin-bottom:12px">
+    <h3 class="title" style="margin-bottom:12px">➕ Ajouter une mesure</h3>
+    <div class="g2" style="margin-bottom:10px">
+      <div class="ig" style="margin-bottom:0"><label>Date</label><input class="inp" type="date" id="bd-date"></div>
+      <div class="ig" style="margin-bottom:0"><label>Poids (kg)</label><input class="inp" type="number" step="0.1" placeholder="75.1" id="bd-poids"></div>
+    </div>
+    <div class="g2" style="margin-bottom:10px">
+      <div class="ig" style="margin-bottom:0"><label>Masse grasse (%)</label><input class="inp" type="number" step="0.1" placeholder="17.8" id="bd-gras"></div>
+      <div class="ig" style="margin-bottom:0"><label>Masse musculaire (%)</label><input class="inp" type="number" step="0.1" placeholder="78.0" id="bd-muscle"></div>
+    </div>
+    <div class="g2" style="margin-bottom:10px">
+      <div class="ig" style="margin-bottom:0"><label>Score Boditrax /1000</label><input class="inp" type="number" placeholder="819" id="bd-score"></div>
+      <div class="ig" style="margin-bottom:0"><label>Masse musculaire (kg)</label><input class="inp" type="number" step="0.1" placeholder="58.6" id="bd-muscle-kg"></div>
+    </div>
+    <button class="btn btn-g btn-full" onclick="saveBD()" style="padding:11px">💾 Enregistrer la mesure</button>
+  </div>
+
+  <!-- Historique mesures -->
+  <div class="card" id="bd-hist-card" style="display:none">
+    <div class="fsb" style="margin-bottom:12px">
+      <h3 class="title">📈 Progression</h3>
+      <span class="badge badge-g" id="bd-count"></span>
+    </div>
+    <div id="bd-hist-list"></div>
+    <canvas id="bd-canvas" height="160" style="margin-top:12px"></canvas>
+  </div>
+
+  <!-- Objectifs Boditrax -->
+  <div class="card">
+    <h3 class="title" style="margin-bottom:10px">🎯 Objectifs Boditrax</h3>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#111318;border-radius:8px;border-left:3px solid #FF8C42"><span style="font-size:12px;color:#8B91A8">Fin juillet · Masse grasse</span><span style="font-size:13px;font-weight:700;color:#FF8C42">≤ 16,5%</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#111318;border-radius:8px;border-left:3px solid #00E87A"><span style="font-size:12px;color:#8B91A8">Fin août · Score Boditrax</span><span style="font-size:13px;font-weight:700;color:#00E87A">≥ 850/1000</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#111318;border-radius:8px;border-left:3px solid #4B9EFF"><span style="font-size:12px;color:#8B91A8">Fin sept · Masse musculaire</span><span style="font-size:13px;font-weight:700;color:#4B9EFF">≥ 60 kg</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#111318;border-radius:8px;border-left:3px solid #A855F7"><span style="font-size:12px;color:#8B91A8">Jan 2027 · Profil visé</span><span style="font-size:13px;font-weight:700;color:#A855F7">Skinny Fit ✨</span></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- REST TIMER -->
+<div id="timer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(6px)">
+  <div style="background:#161921;border:1px solid #2E3347;border-radius:24px;padding:32px;text-align:center;width:280px">
+    <div style="font-size:13px;color:#5A6080;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⏱ Repos</div>
+    <div id="timer-display" style="font-family:Space Grotesk,sans-serif;font-size:72px;font-weight:800;color:#00E87A;line-height:1;margin-bottom:8px">90</div>
+    <div id="timer-label" style="font-size:13px;color:#8B91A8;margin-bottom:20px"></div>
+    <div class="pbar pbar-lg" style="margin-bottom:20px"><div class="pfill" id="timer-bar" style="width:100%"></div></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="pauseTimer()" id="timer-pause-btn" class="btn btn-s" style="flex:1">⏸ Pause</button>
+      <button onclick="stopTimer()" class="btn btn-r" style="flex:1">✕ Stop</button>
+    </div>
+    <button onclick="addTime(30)" style="background:none;border:none;color:#5A6080;font-size:12px;cursor:pointer;margin-top:12px;font-family:inherit">+ 30 secondes</button>
+  </div>
+</div>
+
+
 <!-- MODAL -->
 <div class="modal-bg" id="exo-modal" onclick="if(event.target===this)closeM()"><div class="modal"><div id="m-content"></div></div></div>
 <!-- TOASTS -->
@@ -552,7 +730,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 var DAYS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 var TI=new Date().getDay()===0?6:new Date().getDay()-1;
 var TDK='tasks_'+new Date().toISOString().split('T')[0];
-var TABS=['dash','tracker','muscu','prog','nutrition','shots','courses','objectifs'];
+var TABS=['dash','tracker','muscu','prog','nutrition','shots','courses','objectifs','backup','boditrax'];
 var BN=['dash','tracker','muscu','prog','nutrition','courses','objectifs'];
 var DN=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
 var MN=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
@@ -587,13 +765,48 @@ var TASKS=[
   {id:'lit',label:'Au lit avant 23h',icon:'😴'},
 ];
 var MEALS=[
-  {j:'Lun',p:'Flocons avoine + banane + 2 œufs + eau citron',d:'Blanc poulet + riz basmati + carottes vapeur',n:'Steak bœuf halal + purée patate douce + courgettes',c:'Fromage blanc 0% + kiwi'},
-  {j:'Mar',p:'2 œufs durs + pain complet + orange',d:'Thon + quinoa + concombre + tomates cerises',n:'Cuisse poulet + haricots verts + riz complet',c:'Amandes + pomme'},
-  {j:'Mer',p:'Flocons avoine + lait végétal + banane + miel',d:'Dinde + lentilles corail + carottes',n:'Cabillaud + patate douce + épinards sautés',c:'Fromage blanc 0% + graines courge'},
-  {j:'Jeu',p:'3 œufs + tomates + pain complet + thé',d:'Poulet grillé + boulgour + salade + huile olive',n:'Bœuf haché + riz basmati + courgettes',c:'Banane + noix'},
-  {j:'Ven',p:'Flocons avoine + banane + miel + citron',d:'Thon + riz complet + concombre + tomates cerises',n:'Blanc poulet + quinoa + haricots verts',c:'Fromage blanc 0% + kiwi'},
-  {j:'Sam',p:'2 œufs + pain complet + orange + thé',d:'Côtelette agneau halal + semoule + carottes',n:'Poisson blanc + patate douce + épinards + ail',c:'Amandes + pomme'},
-  {j:'Dim',p:'Flocons avoine + fruits rouges + 2 œufs',d:'Poulet rôti + riz basmati + salade',n:'Bœuf haché + pâtes complètes + courgettes',c:'Fromage blanc 0% + banane'},
+  {j:'Lun',kcal:'2600',type:'Sport · Pecs/Épaules',
+   p:'Flocons avoine 80g + banane + 2 œufs brouillés + eau citron · Oméga 3 + Magnésium',
+   d:'Blanc poulet 150g + riz basmati 100g + carottes vapeur + huile olive',
+   c:'Fromage blanc 0% + amandes 20g (collation 16h30 avant séance)',
+   n:'Steak bœuf halal 180g + patate douce 200g + courgettes · Créatine 3g',
+   inf:'Anis étoilé 20h15'},
+  {j:'Mar',kcal:'2600',type:'Sport · Running',
+   p:'2 œufs + pain complet + orange + eau citron · Oméga 3 + Magnésium',
+   d:'Thon 150g + quinoa 80g + concombre + tomates + huile olive',
+   c:'Banane (16h avant le run · énergie rapide)',
+   n:'Cuisse poulet 180g + riz complet 100g + haricots verts · Créatine 3g',
+   inf:'Fenouil si ballonnements'},
+  {j:'Mer',kcal:'2600',type:'Sport · Dos/Biceps',
+   p:'Flocons avoine 80g + eau tiède + banane + miel · Oméga 3 + Magnésium',
+   d:'Dinde 150g + lentilles corail 80g + carottes',
+   c:'Amandes 25g + pomme (16h30)',
+   n:'Cabillaud 200g + patate douce 180g + épinards sautés ail · Créatine 3g',
+   inf:'Anis étoilé 20h15'},
+  {j:'Jeu',kcal:'2200',type:'Repos · Kcal réduits',
+   p:'3 œufs + tomates + pain complet + thé · Oméga 3 + Magnésium',
+   d:'Poulet grillé 130g + boulgour 70g + salade + huile olive · portion réduite',
+   c:'Fromage blanc 0% + kiwi',
+   n:'Bœuf haché 150g + courgettes + riz basmati 80g · Créatine 3g',
+   inf:'Menthe midi · Anis étoilé soir'},
+  {j:'Ven',kcal:'2600',type:'Sport · Jambes/Fessiers',
+   p:'Flocons avoine 80g + banane + miel + citron · Oméga 3 + Magnésium',
+   d:'Thon 150g + riz complet 90g + concombre + tomates',
+   c:'Noix 20g + orange (16h30)',
+   n:'Blanc poulet 180g + quinoa 100g + haricots verts · Créatine 3g',
+   inf:'Anis étoilé 20h45'},
+  {j:'Sam',kcal:'2600',type:'Sport · Running matinal',
+   p:'Banane + eau citron avant run · Après : 2 œufs + pain complet + orange · Oméga 3 + Magnésium',
+   d:'Côtelette agneau halal + semoule 80g + carottes',
+   c:'Amandes + pomme',
+   n:'Poisson blanc 200g + patate douce + épinards · Créatine 3g',
+   inf:'Fenouil'},
+  {j:'Dim',kcal:'2200',type:'Léger · Batch cooking',
+   p:'Flocons avoine + fruits rouges + 2 œufs · Oméga 3 + Magnésium',
+   d:'Poulet rôti 150g + riz basmati + salade · portion légère',
+   c:'Fromage blanc 0% + banane',
+   n:'Bœuf haché 150g + pâtes complètes 80g + courgettes · Créatine 3g',
+   inf:'Anis étoilé'},
 ];
 var EX={
   0:[
@@ -648,9 +861,12 @@ var SHOP={
   'Épices 🟤':[{n:'Cumin en poudre',q:'1 pot',w:[1]},{n:'Paprika doux',q:'1 pot',w:[1]},{n:'Coriandre',q:'1 pot',w:[1]}],
 };
 var PRESET={
-  '2025-7':{run:'5 km solo',masse:'+1-2 kg',note:'Installer la routine · Basic Fit · 2x running/semaine'},
-  '2025-8':{run:'7 km',masse:'+3-4 kg',note:'Running collectif régulier · progression salle continue'},
-  '2025-9':{run:'10 km',masse:'+4-5 kg lean',note:'Semi-marathon automne visé · bilan complet'},
+  '2026-7':{run:'4,5→5 km',masse:'Stabiliser 75 kg · sécher',note:'Installation routine · automatisme · 2x running · salle 3x · abdos daily · Boditrax bilan fin juillet'},
+  '2026-8':{run:'5→7 km',masse:'Sécher -0,5→1% graisse',note:'3-21 août : MAROC · poids de corps + running matinal avant 8h30 · Créatine + Oméga 3 à emporter · Boditrax bilan 31 août'},
+  '2026-9':{run:'7→10 km',masse:'+1 kg lean muscle',note:'Semi-marathon automne visé · abdos visibles · bilan 2 mois complet'},
+  '2026-10':{run:'10→15 km',masse:'+2 kg lean',note:'Semi-marathon couru · physique skinny fit installé'},
+  '2026-11':{run:'15→18 km',masse:'Consolidation',note:'Physique skinny fit accompli · maintenance'},
+  '2026-12':{run:'18→21 km',masse:'Lean muscular',note:'Semi plein · marathon en vue 2027'},
 };
 var TL={salle:'🏋️ Salle',running:'🏃 Running',collectif:'🏃 Collectif Lille',repos:'🚶 Repos actif'};
 var TC={salle:'#00E87A',running:'#FF8C42',collectif:'#FF8C42',repos:'#A855F7'};
@@ -664,7 +880,7 @@ var cc=JSON.parse(localStorage.getItem('cc')||'{}');
 var uo=JSON.parse(localStorage.getItem('uo')||'{}');
 var sched=JSON.parse(localStorage.getItem('sched')||'null')||DEF;
 var aP=TI,aN=TI,aSh='plan',aCat=Object.keys(SHOP)[0],wf='all';
-var oY=2025,oM=new Date().getMonth()+1,editOpen=false;
+var oY=new Date().getFullYear(),oM=new Date().getMonth()+1,editOpen=false;
 
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
@@ -701,6 +917,9 @@ function renderAll(){
   document.getElementById('hdate').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('hprog').textContent=done+' / '+TASKS.length+' ✓';
   document.getElementById('d-date').textContent=(DAYS[TI]+' · '+now.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})).toUpperCase();
+  // Boditrax baseline badge
+  var bbEl=document.getElementById('d-boditrax');
+  if(bbEl) bbEl.innerHTML='Boditrax J1 · 75,1kg · 17,8% gras · 78% muscle · Score 819/1000';
   document.getElementById('d-seance').textContent=sc.icon+' '+sc.label;
   document.getElementById('d-badge').innerHTML=bdg(sc.type,sc.color);
   var pe=document.getElementById('d-pct');
@@ -997,7 +1216,28 @@ function closeM(){document.getElementById('exo-modal').classList.remove('on');}
 function renderN(){
   document.getElementById('n-days').innerHTML=DAYS.map(function(d,i){return'<button class="dbtn'+(aN===i?' on':'')+'" onclick="selND('+i+')"><span class="dl" style="font-size:11px;font-weight:600">'+d+'</span></button>';}).join('');
   var m=MEALS[aN];
-  document.getElementById('n-meals').innerHTML='<div class="g2" style="margin-bottom:12px">'+[['🌅 Petit-déj',m.p,'#FF8C42'],['☀️ Déjeuner',m.d,'#4B9EFF'],['🌙 Dîner',m.n,'#A855F7'],['🍎 Collation',m.c,'#00E87A']].map(function(x){return'<div class="card" style="border-left:3px solid '+x[2]+';margin-bottom:0;padding:12px 14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:'+x[2]+';margin-bottom:5px">'+x[0]+'</div><div style="font-size:13px;line-height:1.5;color:#8B91A8">'+x[1]+'</div></div>';}).join('')+'</div>';
+  // Header avec type de journée et kcal
+  var dayHeader='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#111318;border-radius:10px;margin-bottom:10px;border:1px solid #242836">'
+    +'<div style="font-size:12px;font-weight:600;color:#F0F2F8">'+m.type+'</div>'
+    +'<div style="display:flex;gap:6px;align-items:center">'
+    +'<span class="badge" style="background:rgba(0,232,122,.1);color:#00E87A;border:1px solid rgba(0,232,122,.2)">'+m.kcal+' kcal</span>'
+    +'<span class="badge" style="background:rgba(75,158,255,.1);color:#4B9EFF;border:1px solid rgba(75,158,255,.2)">160g prot</span>'
+    +'</div></div>';
+  // Repas 2 colonnes
+  var mealsGrid='<div class="g2" style="margin-bottom:10px">'
+    +[['🌅 Petit-déj',m.p,'#FF8C42'],['☀️ Déjeuner',m.d,'#4B9EFF'],['🌙 Dîner',m.n,'#A855F7'],['🍎 Collation',m.c,'#00E87A']].map(function(x){
+      return'<div class="card" style="border-left:3px solid '+x[2]+';margin-bottom:0;padding:12px 14px">'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:'+x[2]+';margin-bottom:5px">'+x[0]+'</div>'
+        +'<div style="font-size:12px;line-height:1.5;color:#8B91A8">'+x[1]+'</div>'
+        +'</div>';
+    }).join('')+'</div>';
+  // Infusion
+  var infCard='<div style="display:flex;align-items:center;gap:10px;padding:9px 13px;background:#111318;border-radius:9px;border:1px solid rgba(0,232,122,.2)">'
+    +'<span style="font-size:15px">🫖</span>'
+    +'<div><div style="font-size:12px;font-weight:600;color:#00E87A">Infusion du soir</div>'
+    +'<div style="font-size:11px;color:#5A6080">'+m.inf+'</div></div>'
+    +'</div>';
+  document.getElementById('n-meals').innerHTML=dayHeader+mealsGrid+infCard;
   document.getElementById('n-rules').innerHTML=[['💊','Créatine 3g avec le dîner · jours de sport uniquement'],['🐟','Oméga 3 (2 gélules) + Magnésium bisglycinate au petit-déjeuner'],['💧','2,5L eau min · 3L les jours de sport · Électrolytes pendant l\'effort'],['🏋️','Dîner dans les 30-45 min après la séance'],['🛒','Batch cooking Dimanche matin + Mercredi soir'],['⚠️','Halal · Pas de Skyr · Pas de poivrons · Pas de whey · Anti-fermentation']].map(function(x){return'<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #1C1F2A;align-items:flex-start"><span style="font-size:15px;flex-shrink:0">'+x[0]+'</span><span style="font-size:13px;line-height:1.5;color:#8B91A8">'+x[1]+'</span></div>';}).join('');
 }
 function selND(i){aN=i;renderN();}
@@ -1126,6 +1366,273 @@ function saveUO(key){
   toast('Objectifs sauvegardés ✓','ok');
 }
 
+// ── ABDO ROUTINE ──
+var ABDO=[
+  {ex:'Gainage planche',dur:'3 × 30s',tip:'Corps en ligne · pas de cambrure · respire',yt:'https://www.youtube.com/results?search_query=gainage+planche+technique'},
+  {ex:'Crunch bicycle',dur:'3 × 15 reps',tip:'Coude vers genou opposé · lent · contrôlé',yt:'https://www.youtube.com/results?search_query=crunch+bicycle+abdos+technique'},
+  {ex:'Relevé de jambes',dur:'3 × 12 reps',tip:'Bas du dos plaqué au sol · jambes quasi-tendues',yt:'https://www.youtube.com/results?search_query=relevé+de+jambes+abdos+technique'},
+  {ex:'Crunch classique',dur:'3 × 20 reps',tip:'Menton vers poitrine · pas de momentum · expirer en montant',yt:'https://www.youtube.com/results?search_query=crunch+abdos+technique+débutant'},
+  {ex:'Gainage latéral',dur:'2 × 20s chaque côté',tip:'Corps aligné · hanche qui monte',yt:'https://www.youtube.com/results?search_query=gainage+latéral+technique'},
+  {ex:'Mountain climbers',dur:'2 × 20 reps',tip:'Hanches basses · alternance rapide · core gainé',yt:'https://www.youtube.com/results?search_query=mountain+climbers+abdos+core'},
+];
+function renderAbdo(){
+  var el=document.getElementById('abdo-list');
+  if(!el) return;
+  el.innerHTML=ABDO.map(function(a){
+    return '<div style="display:flex;gap:12px;align-items:center;padding:10px 13px;background:#111318;border:1px solid #242836;border-radius:9px">'
+      +'<div style="flex:1">'
+      +'<div style="font-size:13px;font-weight:600;margin-bottom:2px">'+a.ex+'</div>'
+      +'<div style="font-size:11px;color:#5A6080">'+a.tip+'</div>'
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0">'
+      +'<div style="font-size:12px;font-weight:600;color:#00E87A;margin-bottom:4px">'+a.dur+'</div>'
+      +'<a href="'+a.yt+'" target="_blank" rel="noopener" style="font-size:10px;color:#4B9EFF;text-decoration:none">▶ YouTube</a>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ── BACKUP / EXPORT ──
+function getAllData(){
+  return {
+    version:1,
+    exportDate:new Date().toISOString(),
+    logs:logs,
+    ml:ml,
+    cc:cc,
+    uo:uo,
+    sched:sched,
+    tasks:tasks,
+  };
+}
+function exportData(){
+  var data=JSON.stringify(getAllData(),null,2);
+  var blob=new Blob([data],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='rebornlife_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast('Backup téléchargé ✓','ok');
+}
+function importData(event){
+  var file=event.target.files[0];
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(!data.version){toast('Fichier invalide','err');return;}
+      if(!confirm('Restaurer ce backup du '+new Date(data.exportDate).toLocaleDateString('fr-FR')+' ? Les données actuelles seront remplacées.')) return;
+      if(data.logs){logs=data.logs;sv('logs',logs);}
+      if(data.ml){ml=data.ml;sv('ml',ml);}
+      if(data.cc){cc=data.cc;sv('cc',cc);}
+      if(data.uo){uo=data.uo;sv('uo',uo);}
+      if(data.sched){sched=data.sched;sv('sched',sched);}
+      if(data.tasks){tasks=data.tasks;sv(TDK,tasks);}
+      renderAll();renderTR();renderMP();renderPS();renderProg();renderC();renderOC();renderOD(oY,oM);renderBackupSummary();
+      toast('Données restaurées ✓','ok');
+    } catch(err){toast('Erreur lecture fichier','err');}
+  };
+  reader.readAsText(file);
+}
+function renderBackupSummary(){
+  var el=document.getElementById('backup-summary');
+  if(!el) return;
+  var allP=logs.filter(function(l){return l.poids;}).map(function(l){return parseFloat(l.poids);});
+  var allR=logs.filter(function(l){return l.run;}).map(function(l){return parseFloat(l.run);});
+  var items=[
+    {icon:'📝',label:'Entrées tracker',val:logs.length+' sessions'},
+    {icon:'⚖️',label:'Données poids',val:allP.length?Math.min.apply(null,allP).toFixed(1)+' → '+allP[0].toFixed(1)+' kg':' — '},
+    {icon:'🏃',label:'Sorties running',val:allR.length?allR.length+' runs · max '+Math.max.apply(null,allR)+' km':' — '},
+    {icon:'💪',label:'Séances muscu',val:Object.keys(ml).length+' séances enregistrées'},
+    {icon:'🎯',label:'Objectifs mensuels',val:Object.keys(uo).length+' mois configurés'},
+  ];
+  el.innerHTML=items.map(function(item){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #1C1F2A">'
+      +'<div style="display:flex;gap:9px;align-items:center"><span style="font-size:15px">'+item.icon+'</span><span style="font-size:13px;color:#8B91A8">'+item.label+'</span></div>'
+      +'<span style="font-size:13px;font-weight:600;color:#F0F2F8">'+item.val+'</span>'
+      +'</div>';
+  }).join('');
+}
+function resetAll(){
+  if(!confirm('⚠️ Effacer TOUTES les données ? Action irréversible — fais un backup d\'abord !')) return;
+  if(!confirm('Dernière confirmation : tout effacer ?')) return;
+  logs=[];ml={};cc={};uo={};sched=DEF;tasks=new Array(TASKS.length).fill(false);
+  ['logs','ml','cc','uo','sched',TDK].forEach(function(k){localStorage.removeItem(k);});
+  renderAll();renderTR();renderMP();renderPS();renderProg();renderC();renderOC();renderOD(oY,oM);renderBackupSummary();
+  toast('Données réinitialisées','ok');
+}
+
+// ── DASHBOARD ABDO MINI ──
+function renderDashAbdo(){
+  var el=document.getElementById('d-abdo-mini');
+  if(!el) return;
+  el.innerHTML=ABDO.slice(0,4).map(function(a){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #1C1F2A">'
+      +'<span style="font-size:12px;color:#8B91A8">'+a.ex+'</span>'
+      +'<span style="font-size:11px;font-weight:600;color:#FF4D6A">'+a.dur+'</span>'
+      +'</div>';
+  }).join('');
+}
+
+// ── REST TIMER ──
+var timerInterval=null,timerSec=0,timerTotal=0,timerPaused=false;
+function startTimer(sec,label){
+  if(timerInterval) clearInterval(timerInterval);
+  timerSec=sec;timerTotal=sec;timerPaused=false;
+  document.getElementById('timer-label').textContent=label||'';
+  document.getElementById('timer-pause-btn').textContent='⏸ Pause';
+  document.getElementById('timer-overlay').style.display='flex';
+  updateTimerDisplay();
+  timerInterval=setInterval(function(){
+    if(timerPaused) return;
+    timerSec--;
+    if(timerSec<=0){
+      clearInterval(timerInterval);
+      timerInterval=null;
+      document.getElementById('timer-display').textContent='GO !';
+      document.getElementById('timer-display').style.color='#FF8C42';
+      document.getElementById('timer-bar').style.width='0%';
+      // Vibrate if supported
+      if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      setTimeout(function(){stopTimer();},2000);
+      return;
+    }
+    updateTimerDisplay();
+  },1000);
+}
+function updateTimerDisplay(){
+  var m=Math.floor(timerSec/60),s=timerSec%60;
+  document.getElementById('timer-display').textContent=(m>0?m+':':'')+(s<10&&m>0?'0':'')+s;
+  document.getElementById('timer-display').style.color=timerSec<=10?'#FF4D6A':timerSec<=30?'#FF8C42':'#00E87A';
+  document.getElementById('timer-bar').style.width=(timerSec/timerTotal*100)+'%';
+}
+function pauseTimer(){
+  timerPaused=!timerPaused;
+  document.getElementById('timer-pause-btn').textContent=timerPaused?'▶ Reprendre':'⏸ Pause';
+}
+function stopTimer(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  document.getElementById('timer-overlay').style.display='none';
+  document.getElementById('timer-display').style.color='#00E87A';
+}
+function addTime(s){timerSec+=s;timerTotal+=s;updateTimerDisplay();}
+function startTimerBtn(btn){
+  var sec=parseInt(btn.getAttribute('data-sec'))||90;
+  startTimer(sec,'Repos · '+sec+'s');
+}
+
+// ── CHARGE CALCULATOR ──
+function calcNextCharge(current,progressRate){
+  // progressRate: 0.05 = 5% augmentation toutes les 2 semaines
+  return Math.ceil((current*(1+(progressRate||0.05)))/2.5)*2.5;
+}
+
+// ── BODITRAX ──
+var bdData=JSON.parse(localStorage.getItem('bdData')||'[]');
+// Add baseline if not already there
+if(!bdData.length){
+  bdData=[{date:'2026-07-01',poids:75.1,gras:17.8,muscle:78.0,score:819,muscleKg:58.6}];
+  localStorage.setItem('bdData',JSON.stringify(bdData));
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var bdDateEl=document.getElementById('bd-date');
+  if(bdDateEl) bdDateEl.value=new Date().toISOString().split('T')[0];
+});
+
+function saveBD(){
+  var d={
+    date:document.getElementById('bd-date').value,
+    poids:parseFloat(document.getElementById('bd-poids').value)||null,
+    gras:parseFloat(document.getElementById('bd-gras').value)||null,
+    muscle:parseFloat(document.getElementById('bd-muscle').value)||null,
+    score:parseFloat(document.getElementById('bd-score').value)||null,
+    muscleKg:parseFloat(document.getElementById('bd-muscle-kg').value)||null,
+  };
+  if(!d.date||(!d.poids&&!d.gras)){toast('Saisis au moins la date et une mesure','err');return;}
+  bdData.unshift(d);
+  localStorage.setItem('bdData',JSON.stringify(bdData));
+  ['bd-poids','bd-gras','bd-muscle','bd-score','bd-muscle-kg'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  renderBD();
+  toast('Mesure Boditrax enregistrée ✓','ok');
+}
+
+function renderBD(){
+  var hc=document.getElementById('bd-hist-card');
+  if(!hc) return;
+  if(bdData.length<=1){hc.style.display='none';return;}
+  hc.style.display='block';
+  var cnt=document.getElementById('bd-count');
+  if(cnt) cnt.textContent=bdData.length+' mesures';
+
+  // Progression list
+  var list=document.getElementById('bd-hist-list');
+  list.innerHTML=bdData.map(function(d,i){
+    var prev=bdData[i+1];
+    var dGras=prev&&d.gras&&prev.gras?(d.gras-prev.gras).toFixed(1):null;
+    var dMuscle=prev&&d.muscleKg&&prev.muscleKg?(d.muscleKg-prev.muscleKg).toFixed(1):null;
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #1C1F2A">'
+      +'<div style="background:#1C1F2A;border-radius:7px;padding:5px 8px;min-width:72px;text-align:center;flex-shrink:0">'
+      +'<div style="font-size:9px;color:#5A6080">'+new Date(d.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+'</div>'
+      +'<div style="font-size:15px;font-weight:700;font-family:Space Grotesk,sans-serif">'+(d.poids||'—')+'</div>'
+      +'<div style="font-size:9px;color:#5A6080">kg</div>'
+      +'</div>'
+      +'<div style="flex:1;display:flex;gap:5px;flex-wrap:wrap">'
+      +(d.gras?'<span class="badge" style="background:rgba(255,140,66,.1);color:#FF8C42;border:1px solid rgba(255,140,66,.2)">'+d.gras+'% gras'+(dGras?'<span style="margin-left:3px;color:'+(parseFloat(dGras)<0?'#00E87A':'#FF4D6A')+'">'+(parseFloat(dGras)<0?'':'+')+(dGras)+'</span>':'')+'</span>':'')
+      +(d.muscle?'<span class="badge" style="background:rgba(0,232,122,.1);color:#00E87A;border:1px solid rgba(0,232,122,.2)">'+d.muscle+'% muscle</span>':'')
+      +(d.muscleKg?'<span class="badge" style="background:rgba(75,158,255,.1);color:#4B9EFF;border:1px solid rgba(75,158,255,.2)">'+d.muscleKg+'kg'+(dMuscle?'<span style="margin-left:3px;color:'+(parseFloat(dMuscle)>0?'#00E87A':'#FF4D6A')+'">'+(parseFloat(dMuscle)>0?'+':'')+dMuscle+'</span>':'')+'</span>':'')
+      +(d.score?'<span class="badge" style="background:rgba(168,85,247,.1);color:#A855F7;border:1px solid rgba(168,85,247,.2)">'+d.score+'/1000</span>':'')
+      +'</div>'
+      +'</div>';
+  }).join('');
+
+  // Graph masse grasse evolution
+  var grasData=bdData.filter(function(d){return d.gras;}).reverse();
+  if(grasData.length>=2){
+    var cv=document.getElementById('bd-canvas');
+    if(cv){
+      drawChart('bd-canvas',grasData.map(function(d){return d.gras;}),grasData.map(function(d){return d.date;}),'#FF8C42',false);
+      cv.title='Évolution masse grasse %';
+    }
+  }
+}
+
+// ── ENHANCED MUSCU with TIMER button ──
+var origRenderMF=renderMF;
+function renderMF(){
+  var si=parseInt(document.getElementById('m-s').value),wk=parseInt(document.getElementById('m-w').value);
+  var exos=EX[si]||[],key=si+'_'+wk,ex=ml[key]||{};
+  document.getElementById('m-form').innerHTML=exos.map(function(e,i){
+    var sets=parseInt(e.s)||3;
+    var rpSec=parseInt(e.rp)||90;
+    var sh=Array.from({length:sets},function(_,s){
+      return '<div class="sbox"><div class="slbl">S'+(s+1)+'</div><input class="sinp" type="number" step="2.5" placeholder="kg" value="'+((ex[i]||[])[s]||'')+'" oninput="uML('+si+','+wk+','+i+','+s+',this.value)"></div>';
+    }).join('');
+    // Next charge suggestion
+    var lastMax=(ex[i]&&ex[i].length)?Math.max.apply(null,ex[i].filter(Boolean)):null;
+    var nextSugg=lastMax?calcNextCharge(lastMax):null;
+    return '<div class="card" style="margin-bottom:8px;padding:13px 15px">'
+      +'<div class="fsb" style="margin-bottom:8px">'
+      +'<div>'
+      +'<div style="font-size:13px;font-weight:600">'+e.e+'</div>'
+      +'<div style="font-size:11px;color:#5A6080;margin-top:2px">'+e.s+' séries · '+e.r+' reps</div>'
+      +(nextSugg&&lastMax?'<div style="font-size:10px;color:#00E87A;margin-top:1px">→ Prochaine charge visée : '+nextSugg+' kg</div>':'')
+      +'</div>'
+      +'<div style="display:flex;gap:5px;flex-direction:column;align-items:flex-end">'
+      +'<button class="btn btn-sm" onclick="openM('+si+','+i+')" style="font-size:10px;background:rgba(75,158,255,.1);border:1px solid rgba(75,158,255,.2);color:#4B9EFF">🔍 Fiche</button>'
+      +'<button class="btn btn-sm" data-sec="'+rpSec+'" onclick="startTimerBtn(this)" style="font-size:10px;background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.2);color:#00E87A">⏱ '+e.rp+'</button>'
+      +'</div>'
+      +'</div>'
+      +'<div class="srow">'+sh+'</div>'
+      +'</div>';
+  }).join('');
+}
+
 // ── COLLAPSIBLE HELPERS ──
 function toggleRules(){
   var el=document.getElementById('n-rules');
@@ -1155,4 +1662,10 @@ switchS('plan');
 renderC();
 renderOC();
 renderOD(oY,oM);
+renderAbdo();
+renderBackupSummary();
+renderDashAbdo();
+renderBD();
+var bdDateEl=document.getElementById('bd-date');
+if(bdDateEl) bdDateEl.value=new Date().toISOString().split('T')[0];
 </script></body></html>
